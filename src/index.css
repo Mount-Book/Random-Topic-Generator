@@ -1,0 +1,87 @@
+:root {
+  font-family:
+    'Hiragino Sans',
+    'Yu Gothic UI',
+    'Yu Gothic',
+    'Noto Sans JP',
+    sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #f2e2a2;
+  background:
+    radial-gradient(circle at top, rgba(255, 212, 59, 0.14), transparent 28%),
+    linear-gradient(180deg, #151515 0%, #090909 54%, #000000 100%);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  --heading-color: #fff6bf;
+  --muted-color: #c7b56c;
+  --accent-strong: #ffd43b;
+  --panel-dark: #121212;
+  --panel-deep: #1b1b1b;
+  --line-color: rgba(255, 212, 59, 0.16);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.55;
+  background-image:
+    linear-gradient(rgba(255, 212, 59, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 212, 59, 0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.75), transparent);
+}
+
+button,
+select {
+  font: inherit;
+}
+
+button:focus-visible,
+select:focus-visible {
+  outline: 3px solid rgba(255, 212, 59, 0.35);
+  outline-offset: 2px;
+}
+
+h1,
+p {
+  margin: 0;
+}
+
+h1 {
+  max-width: 760px;
+  font-family:
+    'BIZ UDPGothic',
+    'Hiragino Sans',
+    sans-serif;
+  color: var(--heading-color);
+  font-size: clamp(2.2rem, 5vw, 4.4rem);
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+}
+
+a {
+  color: inherit;
+}
+
+#root {
+  min-height: 100vh;
+}

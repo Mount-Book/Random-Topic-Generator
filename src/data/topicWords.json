@@ -1,0 +1,130 @@
+{
+  "person": [
+    { "id": "shogun", "text": "将軍", "tags": ["historical", "authority", "public"], "weight": 1.1 },
+    { "id": "principal", "text": "校長", "tags": ["school", "authority", "public"], "weight": 1.1 },
+    { "id": "dark-lord", "text": "魔王", "tags": ["fantasy", "authority", "villain"], "weight": 1 },
+    { "id": "astronaut", "text": "宇宙飛行士", "tags": ["science", "heroic", "public"], "weight": 1 },
+    { "id": "monk", "text": "お坊さん", "tags": ["formal", "ritual", "public"], "weight": 1 },
+    { "id": "idol", "text": "アイドル", "tags": ["showbiz", "popular", "modern"], "weight": 1 },
+    { "id": "detective", "text": "刑事", "tags": ["public", "serious", "investigation"], "weight": 1 },
+    { "id": "grandma", "text": "おばあちゃん", "tags": ["daily", "familiar", "home"], "weight": 1.2 },
+    { "id": "transfer-student", "text": "転校生", "tags": ["school", "daily", "familiar"], "weight": 1.1 },
+    { "id": "announcer", "text": "アナウンサー", "tags": ["public", "media", "formal"], "weight": 1 }
+  ],
+  "job": [
+    { "id": "clerk", "text": "コンビニ店員", "tags": ["retail", "daily", "service"], "weight": 1.2 },
+    { "id": "youtuber", "text": "YouTuber", "tags": ["digital", "media", "modern"], "weight": 1.1 },
+    { "id": "nursery", "text": "保育士", "tags": ["care", "daily", "public"], "weight": 1 },
+    { "id": "lawyer", "text": "弁護士", "tags": ["formal", "public", "serious"], "weight": 1 },
+    { "id": "delivery", "text": "配達員", "tags": ["daily", "service", "moving"], "weight": 1 },
+    { "id": "wedding-planner", "text": "ウェディングプランナー", "tags": ["ceremony", "formal", "service"], "weight": 0.95 },
+    { "id": "barber", "text": "理容師", "tags": ["daily", "service", "familiar"], "weight": 1 },
+    { "id": "zookeeper", "text": "飼育員", "tags": ["animal", "public", "familiar"], "weight": 0.95 }
+  ],
+  "place": [
+    { "id": "wedding", "text": "結婚式", "tags": ["ceremony", "formal", "crowd"], "weight": 1.1 },
+    { "id": "funeral", "text": "葬式", "tags": ["ritual", "formal", "serious"], "weight": 1.05 },
+    { "id": "court", "text": "裁判所", "tags": ["public", "formal", "serious"], "weight": 1 },
+    { "id": "classroom", "text": "教室", "tags": ["school", "daily", "familiar"], "weight": 1.2 },
+    { "id": "onsen", "text": "温泉旅館", "tags": ["travel", "daily", "familiar"], "weight": 1 },
+    { "id": "family-restaurant", "text": "ファミレス", "tags": ["daily", "familiar", "casual"], "weight": 1.2 },
+    { "id": "city-hall", "text": "市役所", "tags": ["public", "formal", "daily"], "weight": 1 },
+    { "id": "theme-park", "text": "テーマパーク", "tags": ["showbiz", "crowd", "modern"], "weight": 1 },
+    { "id": "maternity", "text": "産婦人科の待合室", "tags": ["medical", "serious", "public"], "weight": 0.8 },
+    { "id": "school-assembly", "text": "朝礼", "tags": ["school", "formal", "crowd"], "weight": 1 }
+  ],
+  "situation": [
+    { "id": "world-end", "text": "世界滅亡直前", "tags": ["crisis", "dramatic", "fantasy"], "weight": 1 },
+    { "id": "first-date", "text": "初デート中", "tags": ["romance", "daily", "awkward"], "weight": 1.15 },
+    { "id": "interview", "text": "面接中", "tags": ["formal", "serious", "work"], "weight": 1.15 },
+    { "id": "graduation", "text": "卒業式の最中", "tags": ["school", "ceremony", "crowd"], "weight": 1.05 },
+    { "id": "escape", "text": "逃走中", "tags": ["crisis", "moving", "chaotic"], "weight": 0.95 },
+    { "id": "live", "text": "生放送中", "tags": ["media", "public", "chaotic"], "weight": 1 },
+    { "id": "surgery", "text": "手術直前", "tags": ["medical", "serious", "crisis"], "weight": 0.9 },
+    { "id": "reunion", "text": "同窓会の途中", "tags": ["daily", "crowd", "awkward"], "weight": 1 },
+    { "id": "evacuation", "text": "避難訓練の途中", "tags": ["school", "public", "crisis"], "weight": 1 },
+    { "id": "proposal", "text": "プロポーズの瞬間", "tags": ["romance", "ceremony", "dramatic"], "weight": 0.95 }
+  ],
+  "action": [
+    {
+      "id": "tiktok",
+      "text": "TikTokを撮る",
+      "tags": ["digital", "modern", "media"],
+      "weight": 1.1,
+      "forms": { "teiru": "TikTokを撮っている", "start": "TikTokを撮り始めた" }
+    },
+    {
+      "id": "haggle",
+      "text": "値切る",
+      "tags": ["daily", "service", "petty"],
+      "weight": 1,
+      "forms": { "teiru": "値切っている", "start": "値切り始めた" }
+    },
+    {
+      "id": "review",
+      "text": "レビューを書く",
+      "tags": ["digital", "daily", "opinion"],
+      "weight": 1.1,
+      "forms": { "teiru": "レビューを書いている", "start": "レビューを書き始めた" }
+    },
+    {
+      "id": "live-stream",
+      "text": "ライブ配信を始める",
+      "tags": ["digital", "media", "chaotic"],
+      "weight": 1,
+      "forms": { "teiru": "ライブ配信をしている", "start": "ライブ配信を始めた" }
+    },
+    {
+      "id": "apologize",
+      "text": "先に謝る",
+      "tags": ["formal", "social", "awkward"],
+      "weight": 1,
+      "forms": { "teiru": "先に謝っている", "start": "先に謝り始めた" }
+    },
+    {
+      "id": "dance",
+      "text": "急に踊り出す",
+      "tags": ["showbiz", "chaotic", "public"],
+      "weight": 0.95,
+      "forms": { "teiru": "急に踊っている", "start": "急に踊り始めた" }
+    },
+    {
+      "id": "qrcode",
+      "text": "QR決済をすすめる",
+      "tags": ["modern", "service", "digital"],
+      "weight": 1,
+      "forms": { "teiru": "QR決済をすすめている", "start": "QR決済をすすめ始めた" }
+    },
+    {
+      "id": "survey",
+      "text": "アンケートを取る",
+      "tags": ["public", "awkward", "social"],
+      "weight": 0.95,
+      "forms": { "teiru": "アンケートを取っている", "start": "アンケートを取り始めた" }
+    },
+    {
+      "id": "selfie",
+      "text": "集合写真を撮ろうとする",
+      "tags": ["daily", "crowd", "modern"],
+      "weight": 1,
+      "forms": { "teiru": "集合写真を撮ろうとしている", "start": "集合写真を撮ろうとし始めた" }
+    },
+    {
+      "id": "subscribed",
+      "text": "チャンネル登録をお願いする",
+      "tags": ["digital", "media", "service"],
+      "weight": 0.95,
+      "forms": { "teiru": "チャンネル登録をお願いしている", "start": "チャンネル登録をお願いし始めた" }
+    }
+  ],
+  "modern": [
+    { "id": "smartphone", "text": "スマホ", "tags": ["digital", "modern", "daily"], "weight": 1.2 },
+    { "id": "qrpay", "text": "QR決済", "tags": ["digital", "modern", "service"], "weight": 1 },
+    { "id": "ai", "text": "AI", "tags": ["digital", "modern", "science"], "weight": 1 },
+    { "id": "drone", "text": "ドローン", "tags": ["digital", "modern", "moving"], "weight": 0.9 },
+    { "id": "vtuber", "text": "VTuberアバター", "tags": ["digital", "media", "showbiz"], "weight": 0.95 },
+    { "id": "smartwatch", "text": "スマートウォッチ", "tags": ["digital", "modern", "daily"], "weight": 0.95 },
+    { "id": "food-delivery", "text": "フードデリバリーアプリ", "tags": ["digital", "service", "daily"], "weight": 1 },
+    { "id": "noise-cancel", "text": "ノイズキャンセリングイヤホン", "tags": ["digital", "daily", "personal"], "weight": 0.9 }
+  ]
+}

@@ -1,0 +1,84 @@
+[
+  {
+    "id": "role-swap-short",
+    "text": "{person}が{job}だったらありがちなこと",
+    "slots": [
+      { "key": "person", "category": "person" },
+      { "key": "job", "category": "job" }
+    ],
+    "weight": 1.2,
+    "tags": ["role-swap", "short", "imaginable"]
+  },
+  {
+    "id": "forbidden-line-short",
+    "text": "{place}で絶対に言ってはいけない一言",
+    "slots": [
+      { "key": "place", "category": "place" }
+    ],
+    "weight": 1.15,
+    "tags": ["forbidden", "short", "clear"]
+  },
+  {
+    "id": "situation-reason-medium",
+    "text": "{situation}なのに{action:teiru}理由",
+    "slots": [
+      { "key": "situation", "category": "situation" },
+      { "key": "action", "category": "action" }
+    ],
+    "weight": 1.15,
+    "tags": ["reason", "medium", "expansive"]
+  },
+  {
+    "id": "modern-mix-medium",
+    "text": "{person}が{modern}を使い始めた理由",
+    "slots": [
+      { "key": "person", "category": "person" },
+      { "key": "modern", "category": "modern" }
+    ],
+    "weight": 1.1,
+    "tags": ["modern-mix", "medium", "contrast"]
+  },
+  {
+    "id": "public-slip-medium",
+    "text": "{place}で{person}がうっかり言ってしまったこと",
+    "slots": [
+      { "key": "place", "category": "place" },
+      { "key": "person", "category": "person" }
+    ],
+    "weight": 1,
+    "tags": ["line", "medium", "social"]
+  },
+  {
+    "id": "urgent-review-long",
+    "text": "{situation}なのに{modern}のレビューを書いている{person}。その理由とは？",
+    "slots": [
+      { "key": "situation", "category": "situation" },
+      { "key": "modern", "category": "modern" },
+      { "key": "person", "category": "person" }
+    ],
+    "weight": 0.95,
+    "tags": ["reason", "long", "contrast"]
+  },
+  {
+    "id": "ceremony-action-medium",
+    "text": "{place}で{action:start}{person}に対して周囲が思ったこと",
+    "slots": [
+      { "key": "place", "category": "place" },
+      { "key": "action", "category": "action" },
+      { "key": "person", "category": "person" }
+    ],
+    "weight": 1,
+    "tags": ["scene", "medium", "social"]
+  },
+  {
+    "id": "job-modern-long",
+    "text": "{job}なのに{modern}だけ異常に使いこなしている{person}。なぜそんなことに？",
+    "slots": [
+      { "key": "job", "category": "job" },
+      { "key": "modern", "category": "modern" },
+      { "key": "person", "category": "person" }
+    ],
+    "weight": 1,
+    "tags": ["role-swap", "long", "contrast"]
+  }
+]

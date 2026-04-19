@@ -1,0 +1,38 @@
+[
+  {
+    "id": "wedding-funeral-tone",
+    "type": "text-pair",
+    "leftSlot": "place",
+    "leftText": "結婚式",
+    "rightSlot": "action",
+    "rightText": "レビューを書く",
+    "reason": "式場レビューに直結しすぎて発想の余白が狭い"
+  },
+  {
+    "id": "funeral-tiktok",
+    "type": "tag-pair",
+    "leftSlot": "place",
+    "leftTag": "ritual",
+    "rightSlot": "action",
+    "rightTag": "media",
+    "reason": "儀式と配信系の衝突が強すぎて破綻しやすい"
+  },
+  {
+    "id": "court-dance",
+    "type": "text-pair",
+    "leftSlot": "place",
+    "leftText": "裁判所",
+    "rightSlot": "action",
+    "rightText": "急に踊り出す",
+    "reason": "ベタすぎて意外性が弱い"
+  },
+  {
+    "id": "medical-modern-overkill",
+    "type": "tag-pair",
+    "leftSlot": "situation",
+    "leftTag": "medical",
+    "rightSlot": "modern",
+    "rightTag": "digital",
+    "reason": "緊張感より装置感が勝って意味が薄くなる"
+  }
+]
