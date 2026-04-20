@@ -114,6 +114,8 @@ npm install
 npm run dev
 ```
 
+`/api/feedback` は Vite 開発サーバー上でも動作します。Discord 送信を試す場合は `.env.example` を参考に `DISCORD_FEEDBACK_WEBHOOK_URL` を環境変数へ設定してください。
+
 本番ビルド:
 
 ```bash
@@ -154,6 +156,30 @@ npm run lint
 - 無限の猿定理モードを調整する: `src/lib/topicGenerators/infiniteMonkey.ts`
 
 テンプレートでは `{person}` のような差し込みに加えて、`{action:teiru}` や `{action:start}` のような活用形も使えます。
+
+## フィードバックフォーム
+
+サイト内の `ご意見・ご要望を送る` ボタンからフィードバックを送信できます。フォームは `POST /api/feedback` に送信され、サーバー側で Discord Webhook へ転送されます。
+
+設定する環境変数:
+
+```bash
+DISCORD_FEEDBACK_WEBHOOK_URL=https://discord.com/api/webhooks/...
+DISCORD_FEEDBACK_THREAD_NAME=サイト内フィードバック
+```
+
+フォーラムチャンネルの Webhook を使う場合:
+
+- `DISCORD_FEEDBACK_THREAD_NAME` を指定すると、送信ごとにその名前の投稿先スレッドを作成します
+- 既存スレッドへ送りたい場合は `DISCORD_FEEDBACK_THREAD_ID` を使います
+- `DISCORD_FEEDBACK_THREAD_ID` がある場合はそちらを優先します
+
+補足:
+
+- Webhook URL はクライアントへ露出しません
+- フォーム送信時にページ URL、User-Agent、画面サイズ、言語設定、アプリバージョンなどを自動付与します
+- honeypot と短時間レート制限を入れています
+- Vercel など `api/` ディレクトリをサーバーレス関数として扱う環境でそのまま配置できます
 
 ## 注意点
 

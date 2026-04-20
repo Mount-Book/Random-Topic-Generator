@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { GenerationMode } from "../../../lib/odaiGenerator";
 import { BATCH_SIZE_OPTIONS } from "../constants";
+import { FeedbackModal } from "./FeedbackModal";
 import { GenerationControls } from "./GenerationControls";
 
 type HeroSectionProps = {
@@ -35,7 +36,7 @@ const generationModeDescriptions: Array<{
     value: "json-randomizer",
     title: "全文抽出",
     description:
-      "完成済みのお題ストックから選ぶ方式です。安定してすぐ使えるお題を出したいときに向いています。",
+      "完成済みのお題ストックから選ぶ方式です。安定してすぐ使えるお題を出したいときに向いています。フォームでは全文抽出に追加してほしい渾身のお題も受け付けています。",
   },
   {
     value: "infinite-monkey",
@@ -63,6 +64,7 @@ export const HeroSection = ({
 }: HeroSectionProps) => {
   const [isGenerationModeHelpOpen, setIsGenerationModeHelpOpen] =
     useState(false);
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
 
   return (
     <section className="hero-panel">
@@ -79,6 +81,16 @@ export const HeroSection = ({
         <br />
         生成方式の横にある「？」アイコンから各方式の説明を確認できます！
       </p>
+
+      <div className="hero-actions">
+        <button
+          className="secondary-ghost-button"
+          type="button"
+          onClick={() => setIsFeedbackModalOpen(true)}
+        >
+          ご意見・ご要望を送る
+        </button>
+      </div>
 
       <GenerationControls
         batchSize={batchSize}
@@ -166,6 +178,11 @@ export const HeroSection = ({
           </div>
         </div>
       ) : null}
+
+      <FeedbackModal
+        isOpen={isFeedbackModalOpen}
+        onClose={() => setIsFeedbackModalOpen(false)}
+      />
     </section>
   );
 };
