@@ -19,6 +19,7 @@ import { createTopicKey } from '../utils/topicKey'
 const defaultState = buildInitialState(DEFAULT_GENERATION_MODE)
 
 export const useTopicGenerator = () => {
+  const isDeveloperMode = import.meta.env.DEV
   const [generationMode, setGenerationMode] = useState<GenerationMode>(defaultGenerationMode)
   const [batchSize, setBatchSize] = useState(3)
   const [lineWidth, setLineWidth] = useState(DEFAULT_LINE_WIDTH)
@@ -29,7 +30,9 @@ export const useTopicGenerator = () => {
   const [copyStatus, setCopyStatus] = useState('')
 
   const isDebugPage =
-    typeof window !== 'undefined' ? isDebugPath(window.location.pathname) : false
+    isDeveloperMode && typeof window !== 'undefined'
+      ? isDebugPath(window.location.pathname)
+      : false
 
   useEffect(() => {
     persistSavedTopics(savedTopics)
@@ -98,6 +101,7 @@ export const useTopicGenerator = () => {
     handleRemoveSavedTopic,
     handleSaveTopic,
     isDebugPage,
+    isDeveloperMode,
     lineWidth,
     savedTopics,
     setBatchSize,

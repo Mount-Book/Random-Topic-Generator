@@ -51,12 +51,14 @@ body::before {
 }
 
 button,
-select {
+select,
+input {
   font: inherit;
 }
 
 button:focus-visible,
-select:focus-visible {
+select:focus-visible,
+input:focus-visible {
   outline: 3px solid rgba(255, 212, 59, 0.35);
   outline-offset: 2px;
 }

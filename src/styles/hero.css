@@ -83,6 +83,8 @@
 }
 
 .count-picker select,
+.count-picker input,
+.stepper-input,
 .primary-button,
 .save-chip,
 .copy-chip {
@@ -91,14 +93,88 @@
   font: inherit;
 }
 
-.count-picker select {
+.count-picker select,
+.count-picker input {
   padding: 14px 16px;
   background: rgba(18, 18, 18, 0.96);
   color: #fff6cf;
   box-shadow:
     inset 0 0 0 1px rgba(255, 212, 59, 0.26),
     0 8px 20px rgba(0, 0, 0, 0.22);
+}
+
+.count-picker select {
   appearance: none;
+}
+
+.count-picker input {
+  width: 100%;
+}
+
+.stepper-input {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+  overflow: hidden;
+  border: 1px solid rgba(255, 212, 59, 0.26);
+  background: rgba(18, 18, 18, 0.96);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+}
+
+.stepper-input:focus-within {
+  background: rgba(24, 24, 24, 1);
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.22),
+    0 0 0 4px rgba(255, 212, 59, 0.12);
+  border-color: rgba(255, 212, 59, 0.42);
+}
+
+.stepper-input input {
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.stepper-input input::-webkit-outer-spin-button,
+.stepper-input input::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+
+.stepper-input input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+.stepper-buttons {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  width: 44px;
+  border-left: 1px solid rgba(255, 212, 59, 0.16);
+  background: rgba(255, 212, 59, 0.08);
+}
+
+.stepper-button {
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 0.62rem;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+.stepper-button + .stepper-button {
+  border-top: 1px solid rgba(255, 212, 59, 0.12);
+}
+
+.stepper-button:hover,
+.stepper-button:focus-visible {
+  background: rgba(255, 212, 59, 0.12);
+  color: #fff;
 }
 
 .count-picker select option {
@@ -106,11 +182,13 @@
   color: #fff6cf;
 }
 
-.count-picker select:hover {
+.count-picker select:hover,
+.count-picker input:hover {
   background: rgba(26, 26, 26, 0.98);
 }
 
-.count-picker select:focus-visible {
+.count-picker select:focus-visible,
+.count-picker input:focus-visible {
   background: rgba(24, 24, 24, 1);
 }
 
