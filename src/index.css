@@ -51,12 +51,14 @@ body::before {
 }
 
 button,
-select {
+select,
+input {
   font: inherit;
 }
 
 button:focus-visible,
-select:focus-visible {
+select:focus-visible,
+input:focus-visible {
   outline: 3px solid rgba(255, 212, 59, 0.35);
   outline-offset: 2px;
 }
@@ -67,15 +69,16 @@ p {
 }
 
 h1 {
-  max-width: 760px;
+  max-width: 980px;
   font-family:
     'BIZ UDPGothic',
     'Hiragino Sans',
     sans-serif;
   color: var(--heading-color);
-  font-size: clamp(2.2rem, 5vw, 4.4rem);
+  font-size: clamp(2.2rem, 4.6vw, 4.2rem);
   line-height: 1.08;
   letter-spacing: -0.04em;
+  text-wrap: pretty;
 }
 
 a {

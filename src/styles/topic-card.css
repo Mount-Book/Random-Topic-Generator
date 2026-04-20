@@ -1,0 +1,147 @@
+.topic-card {
+  padding: 22px;
+  border-radius: 26px;
+  background:
+    linear-gradient(180deg, rgba(30, 30, 30, 0.96), rgba(14, 14, 14, 0.96));
+  border: 1px solid var(--line-color);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(12px);
+}
+
+.topic-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.topic-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.topic-number {
+  color: var(--accent-strong);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.save-chip,
+.copy-chip {
+  padding: 9px 12px;
+  color: var(--accent-strong);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.copy-chip {
+  background: rgba(255, 212, 59, 0.1);
+}
+
+.save-chip {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.topic-text {
+  margin-top: 18px;
+  color: var(--heading-color);
+  font-size: 1.2rem;
+  line-height: 1.7;
+  font-weight: 700;
+}
+
+.topic-text.formatted {
+  white-space: pre-line;
+  text-wrap: balance;
+}
+
+.topic-author {
+  margin-top: 10px;
+  color: var(--muted-color);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.topic-note {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  margin-top: 12px;
+  color: var(--muted-color);
+  font-size: 0.84rem;
+}
+
+.topic-note span:first-child {
+  color: var(--accent-strong);
+  font-weight: 700;
+}
+
+.score-breakdown {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
+  margin-top: 14px;
+}
+
+.score-breakdown div {
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.score-breakdown dt,
+.score-breakdown dd {
+  margin: 0;
+}
+
+.score-breakdown dt {
+  color: var(--muted-color);
+  font-size: 0.76rem;
+}
+
+.score-breakdown dd {
+  margin-top: 4px;
+  color: var(--heading-color);
+  font-weight: 700;
+}
+
+.ingredient-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 18px 0 0;
+}
+
+.ingredient-list li {
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: rgba(255, 212, 59, 0.1);
+  color: var(--accent-strong);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+@media (max-width: 720px) {
+  .topic-card {
+    padding: 18px;
+    border-radius: 22px;
+  }
+
+  .topic-text {
+    font-size: 1.04rem;
+  }
+
+  .topic-note {
+    font-size: 0.8rem;
+  }
+
+  .score-breakdown {
+    grid-template-columns: 1fr;
+  }
+}
