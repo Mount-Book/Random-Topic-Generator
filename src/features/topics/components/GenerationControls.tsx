@@ -62,12 +62,19 @@ export const GenerationControls = ({
     </label>
 
     <label className="count-picker">
-      <span>改行の細かさ</span>
-      <select value={lineWidth} onChange={(event) => onLineWidthChange(Number(event.target.value))}>
-        <option value={14}>多め</option>
-        <option value={18}>標準</option>
-        <option value={24}>少なめ</option>
-      </select>
+      <span>改行の目安文字数</span>
+      <input
+        type="number"
+        min={1}
+        step={1}
+        value={lineWidth}
+        onChange={(event) => {
+          const nextValue = event.currentTarget.valueAsNumber
+          if (!Number.isNaN(nextValue)) {
+            onLineWidthChange(nextValue)
+          }
+        }}
+      />
     </label>
 
     <button className="primary-button" onClick={onGenerate}>

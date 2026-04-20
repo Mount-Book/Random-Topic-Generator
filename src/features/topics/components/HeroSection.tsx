@@ -1,12 +1,13 @@
-import { useState } from 'react'
-import type { GenerationMode } from '../../../lib/odaiGenerator'
-import { BATCH_SIZE_OPTIONS } from '../constants'
-import { GenerationControls } from './GenerationControls'
+import { useState } from "react";
+import type { GenerationMode } from "../../../lib/odaiGenerator";
+import { BATCH_SIZE_OPTIONS } from "../constants";
+import { GenerationControls } from "./GenerationControls";
 
 type HeroSectionProps = {
   batchSize: number;
   copyStatus: string;
   debugPath: string;
+  isDeveloperMode: boolean;
   generationMode: GenerationMode;
   generationModeOptions: Array<{ value: GenerationMode; label: string }>;
   handleGenerate: () => void;
@@ -19,36 +20,37 @@ type HeroSectionProps = {
 };
 
 const generationModeDescriptions: Array<{
-  value: GenerationMode
-  title: string
-  description: string
-  note?: string
+  value: GenerationMode;
+  title: string;
+  description: string;
+  note?: string;
 }> = [
   {
-    value: 'word-randomizer',
-    title: 'ワード抽出',
+    value: "word-randomizer",
+    title: "ワード抽出",
     description:
-      'テンプレートに単語辞書を差し込み、相性や意外性をスコア化して、お題として使いやすい候補を選びます。',
+      "テンプレートに単語辞書を差し込み、相性や意外性をスコア化して、お題として使いやすい候補を選びます。",
   },
   {
-    value: 'json-randomizer',
-    title: '全文抽出',
+    value: "json-randomizer",
+    title: "全文抽出",
     description:
-      'fullTopics.json に入っている完成済みのお題を、そのままランダム抽選で取り出します。即戦力のお題を安定して出したいとき向けです。',
+      "完成済みのお題ストックから選ぶ方式です。安定してすぐ使えるお題を出したいときに向いています。",
   },
   {
-    value: 'infinite-monkey',
-    title: '無限の猿定理',
+    value: "infinite-monkey",
+    title: "無限の猿定理",
     description:
-      '文字集合からランダム打鍵を繰り返し、お題らしい長さや記号を偶然満たした文字列だけを採用する実験的な方式です。',
-    note: 'ネタモードです。ジョーク要素が強いため、実際の利用は推奨していません。',
+      "遊び心を優先した実験モードです。意外性の強い、少し変わったお題を楽しみたいときに使えます。",
+    note: "ネタモードです。ジョーク要素が強いため、実際の利用は推奨していません。",
   },
-]
+];
 
 export const HeroSection = ({
   batchSize,
   copyStatus,
   debugPath,
+  isDeveloperMode,
   generationMode,
   generationModeOptions,
   handleGenerate,
@@ -59,20 +61,23 @@ export const HeroSection = ({
   setLineWidth,
   topics,
 }: HeroSectionProps) => {
-  const [isGenerationModeHelpOpen, setIsGenerationModeHelpOpen] = useState(false)
+  const [isGenerationModeHelpOpen, setIsGenerationModeHelpOpen] =
+    useState(false);
 
   return (
     <section className="hero-panel">
-      <p className="eyebrow">IPPONグランプリ風 お題メーカー</p>
+      <p className="eyebrow">大喜利用 お題メーカー</p>
       <h1>
         生成方式を切り替えて、
         <br />
         すぐ使えるお題を出す。
       </h1>
       <p className="lead">
-        ランダムワード抽出と、
+        言葉の組み合わせから作る「ワード抽出」と、
         <br />
-        `json` に入れた全文お題のランダム抽選に加えて、無限の猿定理モードも切り替えできます。
+        完成済みのお題から選ぶ「全文抽出」、遊び心しかない「無限の猿定理」を切り替えできます。
+        <br />
+        生成方式の横にある「？」アイコンから各方式の説明を確認できます！
       </p>
 
       <GenerationControls
@@ -93,12 +98,14 @@ export const HeroSection = ({
         <span>
           {copyStatus ||
             (isDebugPage
-              ? 'debug mode: generation mode comparison'
-              : '詳細ステータスは /debug で確認')}
+              ? "開発用の詳細表示を有効化中"
+              : "お気に入り保存やコピー結果がここに表示されます")}
         </span>
-        <a className="status-link" href={isDebugPage ? '/' : debugPath}>
-          {isDebugPage ? '通常表示へ' : '/debug'}
-        </a>
+        {isDeveloperMode ? (
+          <a className="status-link" href={isDebugPage ? "/" : debugPath}>
+            {isDebugPage ? "通常表示へ" : "開発用の詳細表示へ"}
+          </a>
+        ) : null}
       </div>
 
       {isGenerationModeHelpOpen ? (
@@ -116,7 +123,7 @@ export const HeroSection = ({
           >
             <div className="info-modal-header">
               <div>
-                <p className="eyebrow">Generation Modes</p>
+                <p className="eyebrow">Mode Guide</p>
                 <h2 id="generation-mode-help-title">生成方式の説明</h2>
               </div>
               <button
@@ -133,24 +140,26 @@ export const HeroSection = ({
               {generationModeDescriptions.map((mode) => (
                 <section
                   key={mode.value}
-                  className={`info-modal-card${generationMode === mode.value ? ' is-active' : ''}`}
+                  className={`info-modal-card${generationMode === mode.value ? " is-active" : ""}`}
                 >
                   <div className="info-modal-card-header">
                     <h3>{mode.title}</h3>
                     <div className="info-modal-card-actions">
                       <button
-                        className={`mode-select-button${generationMode === mode.value ? ' is-active' : ''}`}
+                        className={`mode-select-button${generationMode === mode.value ? " is-active" : ""}`}
                         type="button"
                         onClick={() => handleGenerationModeChange(mode.value)}
                       >
                         {generationMode === mode.value
-                          ? 'この方式を現在使用中'
-                          : 'この方式に切り替える'}
+                          ? "この方式を現在使用中"
+                          : "この方式に切り替える"}
                       </button>
                     </div>
                   </div>
                   <p>{mode.description}</p>
-                  {mode.note ? <p className="info-modal-note">{mode.note}</p> : null}
+                  {mode.note ? (
+                    <p className="info-modal-note">{mode.note}</p>
+                  ) : null}
                 </section>
               ))}
             </div>
@@ -158,5 +167,5 @@ export const HeroSection = ({
         </div>
       ) : null}
     </section>
-  )
-}
+  );
+};
