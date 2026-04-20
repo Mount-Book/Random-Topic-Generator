@@ -291,17 +291,8 @@ export const handleFeedbackRequest = async ({
   }
 
   const headers = normalizeHeaders(rawHeaders);
-  let parsedBody: FeedbackBody = {};
-
-  if (typeof body === "string") {
-    try {
-      parsedBody = JSON.parse(body) as FeedbackBody;
-    } catch {
-      parsedBody = {};
-    }
-  } else if (typeof body === "object" && body !== null) {
-    parsedBody = body as FeedbackBody;
-  }
+  const parsedBody =
+    typeof body === "object" && body !== null ? (body as FeedbackBody) : {};
 
   if (sanitizeString(parsedBody.honeypot, 200)) {
     return {
