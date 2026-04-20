@@ -109,6 +109,27 @@ const normalizeHeaders = (
   return normalized;
 };
 
+const parseFeedbackBody = (body: unknown): FeedbackBody | null => {
+  if (typeof body === "string") {
+    const trimmed = body.trim();
+
+    if (!trimmed) {
+      return {};
+    }
+
+    try {
+      const parsed = JSON.parse(trimmed);
+      return typeof parsed === "object" && parsed !== null
+        ? (parsed as FeedbackBody)
+        : null;
+    } catch {
+      return null;
+    }
+  }
+
+  return typeof body === "object" && body !== null ? (body as FeedbackBody) : {};
+};
+
 const getClientIdentifier = (
   headers: Map<string, string>,
   body: FeedbackBody
@@ -291,8 +312,14 @@ export const handleFeedbackRequest = async ({
   }
 
   const headers = normalizeHeaders(rawHeaders);
-  const parsedBody =
-    typeof body === "object" && body !== null ? (body as FeedbackBody) : {};
+  const parsedBody = parseFeedbackBody(body);
+
+  if (!parsedBody) {
+    return {
+      status: 400,
+      body: { message: "リクエスト本文の形式が不正です。" },
+    };
+  }
 
   if (sanitizeString(parsedBody.honeypot, 200)) {
     return {
