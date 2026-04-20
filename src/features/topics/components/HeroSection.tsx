@@ -34,14 +34,14 @@ export const HeroSection = ({
   <section className="hero-panel">
     <p className="eyebrow">IPPONグランプリ風 お題メーカー</p>
     <h1>
-      ランダムワードを混ぜて、
+      生成方式を切り替えて、
       <br />
-      即答したくなるお題を作る。
+      すぐ使えるお題を出す。
     </h1>
     <p className="lead">
-      生成方式ごとにお題の作り方を切り替えられる構成に変更しました。
+      ランダムワード抽出と、
       <br />
-      現在のランダムワード抽出方式では、3件ごとに別ジャンルのお題を順番に生成します。
+      `json` に入れた全文お題のランダム抽選を切り替えできます。
     </p>
 
     <GenerationControls
@@ -61,7 +61,7 @@ export const HeroSection = ({
       <span>
         {copyStatus ||
           (isDebugPage
-            ? "debug mode: template + category words + scoring + NG rules"
+            ? 'debug mode: generation mode comparison'
             : "詳細ステータスは /debug で確認")}
       </span>
       <a className="status-link" href={isDebugPage ? "/" : debugPath}>
