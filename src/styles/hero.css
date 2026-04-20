@@ -61,6 +61,27 @@
   letter-spacing: 0.08em;
 }
 
+.count-picker-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.inline-help-button {
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 212, 59, 0.18);
+  color: var(--accent-strong);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.inline-help-button:hover {
+  background: rgba(255, 212, 59, 0.28);
+}
+
 .count-picker select,
 .primary-button,
 .save-chip,
@@ -131,9 +152,135 @@
   text-decoration: underline;
 }
 
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.62);
+  backdrop-filter: blur(6px);
+}
+
+.info-modal {
+  width: min(760px, 100%);
+  max-height: min(80vh, 720px);
+  overflow: auto;
+  padding: 24px;
+  border: 1px solid rgba(255, 212, 59, 0.18);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at top right, rgba(255, 212, 59, 0.14), transparent 28%),
+    linear-gradient(180deg, rgba(26, 26, 26, 0.98), rgba(12, 12, 12, 0.98));
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+}
+
+.info-modal-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.modal-close-button {
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--heading-color);
+  font: inherit;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.modal-close-button:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.info-modal-list {
+  display: grid;
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.info-modal-card {
+  padding: 18px 18px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.info-modal-card.is-active {
+  border-color: rgba(255, 212, 59, 0.42);
+  background: rgba(255, 212, 59, 0.08);
+}
+
+.info-modal-card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.info-modal-card-header h3 {
+  margin: 0;
+}
+
+.info-modal-card-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.mode-select-button {
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--heading-color);
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mode-select-button:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.mode-select-button.is-active {
+  background: linear-gradient(135deg, #ffd43b, #ffb800);
+  color: #141414;
+  box-shadow: 0 14px 28px rgba(255, 212, 59, 0.18);
+}
+
+.info-modal-card p {
+  margin: 0;
+  color: var(--muted-color);
+  line-height: 1.7;
+}
+
+.info-modal-note {
+  margin-top: 10px;
+  color: #ffd98a;
+  font-size: 0.92rem;
+}
+
 @media (max-width: 720px) {
   .hero-panel {
     padding: 24px 18px;
     border-radius: 24px;
+  }
+
+  .info-modal {
+    padding: 18px;
+  }
+
+  .info-modal-card-header {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }
