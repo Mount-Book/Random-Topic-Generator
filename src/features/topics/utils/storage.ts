@@ -1,6 +1,12 @@
 import { FAVORITES_STORAGE_KEY } from '../constants'
 import type { SavedTopic } from '../types'
 
+const normalizeSavedTopic = (savedTopic: SavedTopic): SavedTopic => ({
+  ...savedTopic,
+  authorName: savedTopic.authorName ?? null,
+  copyPrompt: savedTopic.copyPrompt ?? savedTopic.displayPrompt ?? savedTopic.text,
+})
+
 export const loadSavedTopics = (): SavedTopic[] => {
   if (typeof window === 'undefined') {
     return []
@@ -13,7 +19,7 @@ export const loadSavedTopics = (): SavedTopic[] => {
     }
 
     const parsed = JSON.parse(raw)
-    return Array.isArray(parsed) ? (parsed as SavedTopic[]) : []
+    return Array.isArray(parsed) ? (parsed as SavedTopic[]).map(normalizeSavedTopic) : []
   } catch {
     return []
   }

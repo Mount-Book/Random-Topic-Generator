@@ -57,6 +57,7 @@ const createWordRandomizerCandidate = (
   return {
     text,
     templateId: template.id,
+    authorName: null,
     selectedWords: Object.fromEntries(
       Object.entries(selectedWords).map(([slot, word]) => [
         slot,
@@ -132,6 +133,7 @@ export const createWordRandomizerBatch = (
       id: Date.now() + index,
       ...candidate,
       displayPrompt: insertLineBreaks(candidate.text, maxLineLength),
+      copyPrompt: insertLineBreaks(candidate.text, maxLineLength),
       ingredients: Object.values(candidate.selectedWords).map((word) => word.text),
       fingerprint: createFingerprint(candidate),
     }

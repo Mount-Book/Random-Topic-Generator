@@ -42,6 +42,7 @@ export const TopicCardView = <TTopic extends TopicCard | SavedTopic>({
     </div>
 
     <p className="topic-text formatted">{topic.displayPrompt}</p>
+    {topic.authorName ? <p className="topic-author">作者: {topic.authorName}</p> : null}
     {isDebugPage ? (
       <>
         <p className="topic-note">

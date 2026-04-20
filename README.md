@@ -42,7 +42,7 @@ UI では以下を調整できます。
 - `ワード抽出`
   テンプレートに単語辞書を差し込み、相性や意外性をスコア化して、お題として使いやすい候補を選びます。
 - `全文抽出`
-  `src/data/fullTopics.json` に入っている完成済みのお題を、そのままランダム抽選で取り出します。
+  `src/data/fullTopics.json` に入っている完成済みのお題を、そのままランダム抽選で取り出します。カードには作者名も表示されますが、コピー時には本文だけを扱います。
 - `無限の猿定理`
   有限文字集合からのランダム打鍵で、お題らしい文字列を偶然拾うネタモードです。ジョーク要素が強いため、実利用は推奨していません。
 
@@ -77,7 +77,7 @@ score =
 お題の元データは JSON で管理しています。
 
 - `src/data/topicTemplates.json`: お題テンプレート定義
-- `src/data/fullTopics.json`: 完成済みお題一覧
+- `src/data/fullTopics.json`: 完成済みお題一覧。各要素は `id` / `text` / `authorName`
 - `src/data/topicWords.json`: カテゴリ別ワード辞書
 - `src/data/topicNgRules.json`: 禁止組み合わせルール
 
