@@ -5,9 +5,9 @@
   border: 1px solid var(--line-color);
   border-radius: 32px;
   background:
-    radial-gradient(circle at top right, rgba(255, 212, 59, 0.22), transparent 24%),
-    linear-gradient(135deg, rgba(31, 31, 31, 0.98), rgba(10, 10, 10, 0.98));
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+    radial-gradient(circle at top right, rgba(255, 212, 59, 0.2), transparent 22%),
+    linear-gradient(135deg, rgba(33, 33, 33, 0.98), rgba(11, 11, 11, 0.99));
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.3);
 }
 
 .hero-panel::after {
@@ -109,10 +109,10 @@
 .count-picker select,
 .count-picker input {
   padding: 14px 16px;
-  background: rgba(18, 18, 18, 0.96);
+  background: rgba(21, 21, 21, 0.96);
   color: #fff6cf;
   box-shadow:
-    inset 0 0 0 1px rgba(255, 212, 59, 0.26),
+    inset 0 0 0 1px rgba(255, 212, 59, 0.22),
     0 8px 20px rgba(0, 0, 0, 0.22);
 }
 
@@ -130,7 +130,7 @@
   align-items: stretch;
   overflow: hidden;
   border: 1px solid rgba(255, 212, 59, 0.26);
-  background: rgba(18, 18, 18, 0.96);
+  background: rgba(21, 21, 21, 0.96);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
 }
 
@@ -163,7 +163,7 @@
   grid-template-rows: 1fr 1fr;
   width: 44px;
   border-left: 1px solid rgba(255, 212, 59, 0.16);
-  background: rgba(255, 212, 59, 0.08);
+  background: rgba(255, 212, 59, 0.12);
 }
 
 .stepper-button {
@@ -213,8 +213,8 @@
     transform 180ms ease,
     box-shadow 180ms ease,
     background-color 180ms ease;
-  background: linear-gradient(135deg, #ffd43b, #ffb800);
-  color: #141414;
+  background: linear-gradient(135deg, #ffd43b, #ffbf1f);
+  color: #111111;
   box-shadow: 0 18px 40px rgba(255, 212, 59, 0.24);
 }
 
@@ -222,7 +222,7 @@
   padding: 14px 18px;
   border: 1px solid rgba(255, 212, 59, 0.24);
   border-radius: 16px;
-  background: rgba(255, 212, 59, 0.08);
+  background: rgba(255, 212, 59, 0.1);
   color: var(--heading-color);
   font: inherit;
   font-weight: 700;
@@ -285,7 +285,7 @@
   border-radius: 24px;
   background:
     radial-gradient(circle at top right, rgba(255, 212, 59, 0.14), transparent 28%),
-    linear-gradient(180deg, rgba(26, 26, 26, 0.98), rgba(12, 12, 12, 0.98));
+    linear-gradient(180deg, rgba(30, 30, 30, 0.98), rgba(12, 12, 12, 0.98));
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
   scrollbar-gutter: stable;
 }
@@ -302,7 +302,7 @@
   height: 40px;
   border: 0;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 212, 59, 0.12);
   color: var(--heading-color);
   font: inherit;
   font-size: 1.4rem;
@@ -310,7 +310,7 @@
 }
 
 .modal-close-button:hover {
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 212, 59, 0.2);
 }
 
 .info-modal-list {
@@ -321,9 +321,9 @@
 
 .info-modal-card {
   padding: 18px 18px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 212, 59, 0.12);
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 212, 59, 0.05);
 }
 
 .info-modal-card.is-active {
@@ -353,7 +353,7 @@
   padding: 10px 14px;
   border: 0;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 212, 59, 0.12);
   color: var(--heading-color);
   font: inherit;
   font-size: 0.86rem;
@@ -362,7 +362,7 @@
 }
 
 .mode-select-button:hover {
-  background: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 212, 59, 0.18);
 }
 
 .mode-select-button.is-active {
@@ -432,7 +432,7 @@
   padding: 14px 16px;
   border: 1px solid rgba(255, 212, 59, 0.2);
   border-radius: 16px;
-  background: rgba(18, 18, 18, 0.96);
+  background: rgba(21, 21, 21, 0.96);
   color: #fff6cf;
   box-shadow:
     inset 0 0 0 1px rgba(255, 212, 59, 0.06),
@@ -492,7 +492,7 @@
   padding: 14px 16px;
   border: 1px solid rgba(255, 212, 59, 0.14);
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 212, 59, 0.05);
   color: var(--heading-color);
 }
 
