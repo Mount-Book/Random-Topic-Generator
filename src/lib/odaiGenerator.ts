@@ -2,7 +2,7 @@ import ngRulesData from '../data/topicNgRules.json'
 import templatesData from '../data/topicTemplates.json'
 import wordsData from '../data/topicWords.json'
 
-export type PromptLength = 'short' | 'medium' | 'long'
+type PromptLength = 'short' | 'medium' | 'long'
 
 type TemplateTag =
   | 'role-swap'
@@ -97,17 +97,35 @@ export type TopicCard = GeneratedCandidate & {
 
 export type GenerateTopicOptions = {
   candidateCount?: number
-  promptLength?: PromptLength
   templateTagFilter?: TemplateTag[]
+  templateIdFilter?: string[]
   history?: TopicFingerprint[]
 }
 
 const templates = templatesData as TemplateDefinition[]
 const lexicon = wordsData as Lexicon
 const ngRules = ngRulesData as NgRule[]
+const templateById = new Map(templates.map((template) => [template.id, template]))
 
 const DEFAULT_CANDIDATE_COUNT = 20
 export const MAX_HISTORY = 12
+export const DEFAULT_GENERATION_MODE = 'word-randomizer' as const
+
+export type GenerationMode = typeof DEFAULT_GENERATION_MODE
+
+export const generationModeOptions: Array<{ value: GenerationMode; label: string }> = [
+  { value: 'word-randomizer', label: 'ランダムワード抽出' },
+]
+
+type TopicGenre = 'line' | 'mismatch' | 'scenario'
+
+const topicGenreCycle: TopicGenre[] = ['line', 'mismatch', 'scenario']
+
+const templateIdsByGenre: Record<TopicGenre, string[]> = {
+  line: ['forbidden-line-short', 'public-slip-medium'],
+  mismatch: ['role-swap-short', 'modern-mix-medium', 'job-modern-long'],
+  scenario: ['situation-reason-medium', 'urgent-review-long', 'ceremony-action-medium'],
+}
 
 const pairWeightsBySlot: Record<string, number> = {
   'person:job': 1.25,
@@ -395,18 +413,17 @@ const createCandidate = (
 }
 
 export const generateTopic = (options: GenerateTopicOptions = {}): GeneratedCandidate => {
-  const {
-    candidateCount = DEFAULT_CANDIDATE_COUNT,
-    promptLength,
-    templateTagFilter = [],
-    history = [],
-  } = options
+  const { candidateCount = DEFAULT_CANDIDATE_COUNT, templateTagFilter = [], templateIdFilter = [], history = [] } = options
 
   const availableTemplates = templates.filter((template) => {
-    const lengthOk = promptLength ? template.tags.includes(promptLength) : true
     const tagOk = templateTagFilter.length === 0 || templateTagFilter.every((tag) => template.tags.includes(tag))
-    return lengthOk && tagOk
+    const idOk = templateIdFilter.length === 0 || templateIdFilter.includes(template.id)
+    return tagOk && idOk
   })
+
+  if (availableTemplates.length === 0) {
+    throw new Error('条件に合うテンプレートがありません')
+  }
 
   let bestCandidate: GeneratedCandidate | null = null
 
@@ -430,18 +447,20 @@ export const generateTopic = (options: GenerateTopicOptions = {}): GeneratedCand
   return bestCandidate
 }
 
-export const createTopicBatch = (
+const createWordRandomizerBatch = (
   count: number,
-  promptLength: PromptLength,
   maxLineLength: number,
   history: TopicFingerprint[],
 ) => {
   const rollingHistory = [...history]
+  const safeCount = Math.max(3, Math.floor(count / 3) * 3)
 
-  return Array.from({ length: count }, (_, index) => {
+  return Array.from({ length: safeCount }, (_, index) => {
+    const genre = topicGenreCycle[index % topicGenreCycle.length]
+    const genreTemplateIds = templateIdsByGenre[genre]
     const candidate = generateTopic({
       candidateCount: DEFAULT_CANDIDATE_COUNT,
-      promptLength,
+      templateIdFilter: genreTemplateIds.filter((templateId) => templateById.has(templateId)),
       history: rollingHistory,
     })
 
@@ -458,8 +477,19 @@ export const createTopicBatch = (
   })
 }
 
-export const buildInitialState = () => {
-  const topics = createTopicBatch(3, 'medium', 18, [])
+const batchGenerators: Record<GenerationMode, typeof createWordRandomizerBatch> = {
+  'word-randomizer': createWordRandomizerBatch,
+}
+
+export const createTopicBatch = (
+  count: number,
+  generationMode: GenerationMode,
+  maxLineLength: number,
+  history: TopicFingerprint[],
+) => batchGenerators[generationMode](count, maxLineLength, history)
+
+export const buildInitialState = (generationMode: GenerationMode = DEFAULT_GENERATION_MODE) => {
+  const topics = createTopicBatch(3, generationMode, 18, [])
   return {
     topics,
     history: topics.map((topic) => createFingerprint(topic)),
