@@ -1,3 +1,4 @@
+import fullTopicsData from '../data/fullTopics.json'
 import ngRulesData from '../data/topicNgRules.json'
 import templatesData from '../data/topicTemplates.json'
 import wordsData from '../data/topicWords.json'
@@ -32,6 +33,11 @@ type TemplateDefinition = {
   slots: SlotDefinition[]
   weight: number
   tags: TemplateTag[]
+}
+
+type FullTopicDefinition = {
+  id: string
+  text: string
 }
 
 type WordEntry = {
@@ -103,6 +109,7 @@ export type GenerateTopicOptions = {
 }
 
 const templates = templatesData as TemplateDefinition[]
+const fullTopics = fullTopicsData as FullTopicDefinition[]
 const lexicon = wordsData as Lexicon
 const ngRules = ngRulesData as NgRule[]
 const templateById = new Map(templates.map((template) => [template.id, template]))
@@ -111,10 +118,11 @@ const DEFAULT_CANDIDATE_COUNT = 20
 export const MAX_HISTORY = 12
 export const DEFAULT_GENERATION_MODE = 'word-randomizer' as const
 
-export type GenerationMode = typeof DEFAULT_GENERATION_MODE
+export type GenerationMode = 'word-randomizer' | 'json-randomizer'
 
 export const generationModeOptions: Array<{ value: GenerationMode; label: string }> = [
-  { value: 'word-randomizer', label: 'ランダムワード抽出' },
+  { value: 'word-randomizer', label: 'ワード抽出' },
+  { value: 'json-randomizer', label: '全文抽出' },
 ]
 
 type TopicGenre = 'line' | 'mismatch' | 'scenario'
@@ -367,7 +375,7 @@ const createFingerprint = (candidate: GeneratedCandidate): TopicFingerprint => (
   slotWordIds: Object.values(candidate.selectedWords).map((word) => word.id),
 })
 
-const createCandidate = (
+const createWordRandomizerCandidate = (
   template: TemplateDefinition,
   history: TopicFingerprint[],
 ): GeneratedCandidate | null => {
@@ -412,7 +420,7 @@ const createCandidate = (
   }
 }
 
-export const generateTopic = (options: GenerateTopicOptions = {}): GeneratedCandidate => {
+const generateWordRandomizerTopic = (options: GenerateTopicOptions = {}): GeneratedCandidate => {
   const { candidateCount = DEFAULT_CANDIDATE_COUNT, templateTagFilter = [], templateIdFilter = [], history = [] } = options
 
   const availableTemplates = templates.filter((template) => {
@@ -429,7 +437,7 @@ export const generateTopic = (options: GenerateTopicOptions = {}): GeneratedCand
 
   for (let index = 0; index < candidateCount; index += 1) {
     const template = pickWeighted(availableTemplates, (candidate) => candidate.weight)
-    const candidate = createCandidate(template, history)
+    const candidate = createWordRandomizerCandidate(template, history)
 
     if (!candidate) {
       continue
@@ -447,6 +455,76 @@ export const generateTopic = (options: GenerateTopicOptions = {}): GeneratedCand
   return bestCandidate
 }
 
+const pickRandomFullTopic = (
+  availableTopics: FullTopicDefinition[],
+  history: TopicFingerprint[],
+  usedTemplateIds: Set<string>,
+) => {
+  const recent = history.slice(-MAX_HISTORY)
+  const withoutRecentDuplicates = availableTopics.filter(
+    (topic) =>
+      !usedTemplateIds.has(topic.id) &&
+      !recent.some((previous) => previous.templateId === topic.id || previous.text === topic.text),
+  )
+
+  const pool =
+    withoutRecentDuplicates.length > 0
+      ? withoutRecentDuplicates
+      : availableTopics.filter((topic) => !usedTemplateIds.has(topic.id))
+
+  if (pool.length === 0) {
+    throw new Error('抽選可能なお題がありません')
+  }
+
+  return pool[Math.floor(Math.random() * pool.length)]
+}
+
+const generateJsonRandomizerTopic = (options: GenerateTopicOptions = {}): GeneratedCandidate => {
+  const { templateIdFilter = [], history = [] } = options
+  const availableTopics =
+    templateIdFilter.length > 0
+      ? fullTopics.filter((topic) => templateIdFilter.includes(topic.id))
+      : fullTopics
+
+  if (availableTopics.length === 0) {
+    throw new Error('条件に合うお題がありません')
+  }
+
+  const selectedTopic = pickRandomFullTopic(availableTopics, history, new Set())
+  const isRecentDuplicate = history
+    .slice(-MAX_HISTORY)
+    .some((previous) => previous.templateId === selectedTopic.id || previous.text === selectedTopic.text)
+
+  const clarity = selectedTopic.text.length <= 22 ? 8 : selectedTopic.text.length <= 34 ? 7 : 6
+  const novelty = isRecentDuplicate ? -4 : 2
+
+  const scoreBreakdown: ScoreBreakdown = {
+    surprise: 0,
+    imageability: 0,
+    clarity,
+    novelty,
+    ordinaryPenalty: 0,
+    chaosPenalty: 0,
+    ngPenalty: 0,
+  }
+
+  return {
+    text: selectedTopic.text,
+    templateId: selectedTopic.id,
+    selectedWords: {},
+    score: clarity + novelty,
+    scoreBreakdown,
+  }
+}
+
+export const generateTopic = (
+  generationMode: GenerationMode = DEFAULT_GENERATION_MODE,
+  options: GenerateTopicOptions = {},
+): GeneratedCandidate =>
+  generationMode === 'json-randomizer'
+    ? generateJsonRandomizerTopic(options)
+    : generateWordRandomizerTopic(options)
+
 const createWordRandomizerBatch = (
   count: number,
   maxLineLength: number,
@@ -458,7 +536,7 @@ const createWordRandomizerBatch = (
   return Array.from({ length: safeCount }, (_, index) => {
     const genre = topicGenreCycle[index % topicGenreCycle.length]
     const genreTemplateIds = templateIdsByGenre[genre]
-    const candidate = generateTopic({
+    const candidate = generateWordRandomizerTopic({
       candidateCount: DEFAULT_CANDIDATE_COUNT,
       templateIdFilter: genreTemplateIds.filter((templateId) => templateById.has(templateId)),
       history: rollingHistory,
@@ -477,8 +555,40 @@ const createWordRandomizerBatch = (
   })
 }
 
-const batchGenerators: Record<GenerationMode, typeof createWordRandomizerBatch> = {
+const createJsonRandomizerBatch = (
+  count: number,
+  maxLineLength: number,
+  history: TopicFingerprint[],
+) => {
+  const safeCount = Math.max(1, count)
+  const rollingHistory = [...history]
+  const usedTemplateIds = new Set<string>()
+
+  return Array.from({ length: safeCount }, (_, index) => {
+    const selectedTopic = pickRandomFullTopic(fullTopics, rollingHistory, usedTemplateIds)
+    usedTemplateIds.add(selectedTopic.id)
+
+    const candidate = generateJsonRandomizerTopic({
+      templateIdFilter: [selectedTopic.id],
+      history: rollingHistory,
+    })
+
+    const topic: TopicCard = {
+      id: Date.now() + index,
+      ...candidate,
+      displayPrompt: insertLineBreaks(candidate.text, maxLineLength),
+      ingredients: [],
+      fingerprint: createFingerprint(candidate),
+    }
+
+    rollingHistory.push(topic.fingerprint)
+    return topic
+  })
+}
+
+const batchGenerators: Record<GenerationMode, (count: number, maxLineLength: number, history: TopicFingerprint[]) => TopicCard[]> = {
   'word-randomizer': createWordRandomizerBatch,
+  'json-randomizer': createJsonRandomizerBatch,
 }
 
 export const createTopicBatch = (
