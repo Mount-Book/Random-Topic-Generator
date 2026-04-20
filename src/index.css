@@ -7,7 +7,7 @@
     sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  color: #f2e2a2;
+  color: #f1df8d;
   background:
     radial-gradient(circle at top, rgba(255, 212, 59, 0.14), transparent 28%),
     linear-gradient(180deg, #151515 0%, #090909 54%, #000000 100%);
@@ -15,12 +15,15 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  --heading-color: #fff6bf;
-  --muted-color: #c7b56c;
+  --heading-color: #fff3b1;
+  --muted-color: #c8b45f;
   --accent-strong: #ffd43b;
-  --panel-dark: #121212;
-  --panel-deep: #1b1b1b;
-  --line-color: rgba(255, 212, 59, 0.16);
+  --accent-soft: #ffbf1f;
+  --panel-dark: #111111;
+  --panel-deep: #1d1d1d;
+  --surface-elevated: rgba(20, 20, 20, 0.94);
+  --surface-muted: rgba(34, 34, 34, 0.9);
+  --line-color: rgba(255, 212, 59, 0.24);
 }
 
 * {
@@ -35,6 +38,9 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  background:
+    radial-gradient(circle at top, rgba(255, 212, 59, 0.14), transparent 28%),
+    linear-gradient(180deg, #151515 0%, #090909 54%, #000000 100%);
 }
 
 body::before {
