@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 import {
   DEFAULT_GENERATION_MODE,
@@ -14,6 +14,31 @@ import {
 const debugPath = '/debug'
 const normalizePath = (path: string) => path.replace(/\/+$/, '') || '/'
 const defaultState = buildInitialState(DEFAULT_GENERATION_MODE)
+const favoritesStorageKey = 'random-topic-generator:favorites'
+
+type SavedTopic = TopicCard & {
+  savedAt: number
+}
+
+const createTopicKey = (topic: Pick<TopicCard, 'templateId' | 'text'>) => `${topic.templateId}::${topic.text}`
+
+const loadSavedTopics = (): SavedTopic[] => {
+  if (typeof window === 'undefined') {
+    return []
+  }
+
+  try {
+    const raw = window.localStorage.getItem(favoritesStorageKey)
+    if (!raw) {
+      return []
+    }
+
+    const parsed = JSON.parse(raw)
+    return Array.isArray(parsed) ? (parsed as SavedTopic[]) : []
+  } catch {
+    return []
+  }
+}
 
 function App() {
   const isDebugPage = normalizePath(window.location.pathname) === debugPath
@@ -22,8 +47,13 @@ function App() {
   const [lineWidth, setLineWidth] = useState(18)
   const [topics, setTopics] = useState<TopicCard[]>(defaultState.topics)
   const [history, setHistory] = useState<TopicFingerprint[]>(defaultState.history)
+  const [savedTopics, setSavedTopics] = useState<SavedTopic[]>(loadSavedTopics)
   const [copiedId, setCopiedId] = useState<number | null>(null)
   const [copyStatus, setCopyStatus] = useState('')
+
+  useEffect(() => {
+    window.localStorage.setItem(favoritesStorageKey, JSON.stringify(savedTopics))
+  }, [savedTopics])
 
   const handleGenerate = () => {
     const nextTopics = createTopicBatch(batchSize, generationMode, lineWidth, history)
@@ -40,6 +70,27 @@ function App() {
     await navigator.clipboard.writeText(topic.displayPrompt)
     setCopiedId(topic.id)
     setCopyStatus('お題をコピーしました')
+  }
+
+  const handleSaveTopic = (topic: TopicCard) => {
+    const topicKey = createTopicKey(topic)
+    const alreadySaved = savedTopics.some((savedTopic) => createTopicKey(savedTopic) === topicKey)
+
+    if (alreadySaved) {
+      setCopyStatus('このお題はすでにお気に入り保存済みです')
+      return
+    }
+
+    setSavedTopics((previous) => [{ ...topic, savedAt: Date.now() }, ...previous])
+    setCopyStatus('お気に入りに保存しました')
+  }
+
+  const handleRemoveSavedTopic = (topic: SavedTopic) => {
+    const topicKey = createTopicKey(topic)
+    setSavedTopics((previous) =>
+      previous.filter((savedTopic) => createTopicKey(savedTopic) !== topicKey),
+    )
+    setCopyStatus('お気に入りから削除しました')
   }
 
   return (
@@ -125,9 +176,14 @@ function App() {
           <article key={topic.id} className="topic-card">
             <div className="topic-card-header">
               <span className="topic-number">ODAI {String(index + 1).padStart(2, '0')}</span>
-              <button className="copy-chip" onClick={() => void handleCopyOne(topic)}>
-                {copiedId === topic.id ? 'コピー済み' : 'コピー'}
-              </button>
+              <div className="topic-actions">
+                <button className="save-chip" onClick={() => handleSaveTopic(topic)}>
+                  お気に入り
+                </button>
+                <button className="copy-chip" onClick={() => void handleCopyOne(topic)}>
+                  {copiedId === topic.id ? 'コピー済み' : 'コピー'}
+                </button>
+              </div>
             </div>
 
             <p className="topic-text formatted">{topic.displayPrompt}</p>
@@ -174,6 +230,51 @@ function App() {
             ) : null}
           </article>
         ))}
+      </section>
+
+      <section className="saved-panel" aria-label="保存したお気に入りお題">
+        <div className="saved-panel-header">
+          <h2>お気に入り</h2>
+          <span>{savedTopics.length}件保存済み</span>
+        </div>
+
+        {savedTopics.length === 0 ? (
+          <p className="saved-empty">生成したお題をお気に入り登録すると、ここに保存されます。</p>
+        ) : (
+          <div className="topic-grid">
+            {savedTopics.map((topic) => (
+              <article key={`${createTopicKey(topic)}-${topic.savedAt}`} className="topic-card saved-topic-card">
+                <div className="topic-card-header">
+                  <span className="topic-number">FAVORITE</span>
+                  <div className="topic-actions">
+                    <button className="save-chip remove-chip" onClick={() => handleRemoveSavedTopic(topic)}>
+                      削除
+                    </button>
+                    <button className="copy-chip" onClick={() => void handleCopyOne(topic)}>
+                      {copiedId === topic.id ? 'コピー済み' : 'コピー'}
+                    </button>
+                  </div>
+                </div>
+
+                <p className="topic-text formatted">{topic.displayPrompt}</p>
+                {isDebugPage ? (
+                  <>
+                    <p className="topic-note">
+                      <span>{topic.templateId}</span>
+                      <span>score {topic.score.toFixed(1)}</span>
+                    </p>
+
+                    <ul className="ingredient-list" aria-label="使用ワード">
+                      {topic.ingredients.map((ingredient) => (
+                        <li key={`${topic.id}-${ingredient}`}>{ingredient}</li>
+                      ))}
+                    </ul>
+                  </>
+                ) : null}
+              </article>
+            ))}
+          </div>
+        )}
       </section>
     </main>
   )
