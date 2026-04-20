@@ -59,6 +59,13 @@
   text-wrap: balance;
 }
 
+.topic-author {
+  margin-top: 10px;
+  color: var(--muted-color);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
 .topic-note {
   display: flex;
   flex-wrap: wrap;

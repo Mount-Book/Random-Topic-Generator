@@ -132,6 +132,7 @@ const createInfiniteMonkeyCandidate = (
   return {
     text,
     templateId: 'infinite-monkey',
+    authorName: null,
     selectedWords: {
       alphabet: {
         id: 'alphabet-size',
@@ -199,6 +200,7 @@ export const createInfiniteMonkeyBatch = (
       id: Date.now() + index,
       ...candidate,
       displayPrompt: insertLineBreaks(candidate.text, maxLineLength),
+      copyPrompt: insertLineBreaks(candidate.text, maxLineLength),
       ingredients: Object.values(candidate.selectedWords).map((word) => word.text),
       fingerprint: createFingerprint(candidate),
     }

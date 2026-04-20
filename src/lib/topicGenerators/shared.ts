@@ -38,6 +38,7 @@ export type TemplateDefinition = {
 export type FullTopicDefinition = {
   id: string
   text: string
+  authorName?: string
 }
 
 export type WordEntry = {
@@ -83,6 +84,7 @@ export type ScoreBreakdown = {
 export type GeneratedCandidate = {
   text: string
   templateId: string
+  authorName: string | null
   selectedWords: Record<string, { id: string; text: string; tags: string[] }>
   score: number
   scoreBreakdown: ScoreBreakdown
@@ -97,6 +99,7 @@ export type TopicFingerprint = {
 export type TopicCard = GeneratedCandidate & {
   id: number
   displayPrompt: string
+  copyPrompt: string
   ingredients: string[]
   fingerprint: TopicFingerprint
 }

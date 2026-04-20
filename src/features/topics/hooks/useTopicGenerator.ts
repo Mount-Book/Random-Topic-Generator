@@ -62,7 +62,7 @@ export const useTopicGenerator = () => {
   }
 
   const handleCopyTopic = async (topic: TopicCard | SavedTopic) => {
-    await navigator.clipboard.writeText(topic.displayPrompt)
+    await navigator.clipboard.writeText(topic.copyPrompt)
     setCopiedId(topic.id)
     setCopyStatus('お題をコピーしました')
   }

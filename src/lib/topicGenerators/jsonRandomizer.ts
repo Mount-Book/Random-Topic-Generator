@@ -10,6 +10,11 @@ import {
   type TopicFingerprint,
 } from './shared'
 
+const normalizeAuthorName = (authorName?: string) => {
+  const normalized = authorName?.trim()
+  return normalized && normalized.length > 0 ? normalized : '匿名'
+}
+
 export const pickRandomFullTopic = (
   availableTopics: FullTopicDefinition[],
   history: TopicFingerprint[],
@@ -68,6 +73,7 @@ export const generateJsonRandomizerTopic = (
   return {
     text: selectedTopic.text,
     templateId: selectedTopic.id,
+    authorName: normalizeAuthorName(selectedTopic.authorName),
     selectedWords: {},
     score: clarity + novelty,
     scoreBreakdown,
@@ -92,10 +98,13 @@ export const createJsonRandomizerBatch = (
       history: rollingHistory,
     })
 
+    const formattedText = insertLineBreaks(candidate.text, maxLineLength)
+
     const topic: TopicCard = {
       id: Date.now() + index,
       ...candidate,
-      displayPrompt: insertLineBreaks(candidate.text, maxLineLength),
+      displayPrompt: formattedText,
+      copyPrompt: formattedText,
       ingredients: [],
       fingerprint: createFingerprint(candidate),
     }
