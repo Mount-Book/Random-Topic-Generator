@@ -183,7 +183,7 @@ const isRateLimited = (identifier: string) => {
 
 const getWebhookUrl = () => {
   for (const key of FEEDBACK_WEBHOOK_ENV_KEYS) {
-    const value = process.env[key];
+    const value = process.env[key]?.trim();
     if (value) {
       return value;
     }
@@ -275,6 +275,7 @@ export const handleFeedbackRequest = async ({
   headers: rawHeaders,
   method,
 }: FeedbackRequestContext): Promise<FeedbackResponse> => {
+  try {
   if (method === "OPTIONS") {
     return {
       status: 204,
@@ -373,7 +374,17 @@ export const handleFeedbackRequest = async ({
     ? undefined
     : getOptionalEnvValue(FEEDBACK_THREAD_NAME_ENV_KEYS);
 
-  const discordWebhookUrl = new URL(webhookUrl);
+  let discordWebhookUrl: URL;
+
+  try {
+    discordWebhookUrl = new URL(webhookUrl);
+  } catch {
+    return {
+      status: 500,
+      body: { message: "Webhook URL の形式が不正です。" },
+    };
+  }
+
   if (threadId) {
     discordWebhookUrl.searchParams.set("thread_id", threadId);
   }
@@ -427,4 +438,15 @@ export const handleFeedbackRequest = async ({
       message: "フィードバックを送信しました。ありがとうございます。",
     },
   };
+  } catch (error) {
+    console.error("Feedback request failed", error);
+
+    return {
+      status: 500,
+      body: {
+        message:
+          "サーバー側で送信処理に失敗しました。時間をおいて再度お試しください。",
+      },
+    };
+  }
 };
