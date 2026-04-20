@@ -10,6 +10,7 @@ type GenerationControlsProps = {
   onGenerate: () => void
   onGenerationModeChange: (value: GenerationMode) => void
   onLineWidthChange: (value: number) => void
+  onOpenGenerationModeHelp: () => void
 }
 
 export const GenerationControls = ({
@@ -22,6 +23,7 @@ export const GenerationControls = ({
   onGenerate,
   onGenerationModeChange,
   onLineWidthChange,
+  onOpenGenerationModeHelp,
 }: GenerationControlsProps) => (
   <div className="control-bar">
     <label className="count-picker">
@@ -36,7 +38,17 @@ export const GenerationControls = ({
     </label>
 
     <label className="count-picker">
-      <span>生成方式</span>
+      <span className="count-picker-title">
+        生成方式
+        <button
+          className="inline-help-button"
+          type="button"
+          onClick={onOpenGenerationModeHelp}
+          aria-label="生成方式の説明を開く"
+        >
+          ?
+        </button>
+      </span>
       <select
         value={generationMode}
         onChange={(event) => onGenerationModeChange(event.target.value as GenerationMode)}
