@@ -114,7 +114,7 @@ npm install
 npm run dev
 ```
 
-`/api/feedback` は Vite 開発サーバー上でも動作します。Discord 送信を試す場合は `.env.example` を参考に `DISCORD_FEEDBACK_WEBHOOK_URL` を環境変数へ設定してください。
+`/api/feedback` は Vite 開発サーバー上でも動作します。Discord 送信を試す場合は `.env.example` を参考に `.env.local` またはシェル環境変数へ `DISCORD_FEEDBACK_WEBHOOK_URL` を設定してください。
 
 本番ビルド:
 
@@ -159,7 +159,7 @@ npm run lint
 
 ## フィードバックフォーム
 
-サイト内の `ご意見・ご要望を送る` ボタンからフィードバックを送信できます。フォームは `POST /api/feedback` に送信され、サーバー側で Discord Webhook へ転送されます。
+サイト内の `ご意見・ご要望を送る` ボタンからフィードバックを送信できます。フォームは `POST /api/feedback` に送信され、`Vercel Function` から Discord Webhook へ転送されます。
 
 設定する環境変数:
 
@@ -180,6 +180,35 @@ DISCORD_FEEDBACK_THREAD_NAME=サイト内フィードバック
 - フォーム送信時にページ URL、User-Agent、画面サイズ、言語設定、アプリバージョンなどを自動付与します
 - honeypot と短時間レート制限を入れています
 - Vercel など `api/` ディレクトリをサーバーレス関数として扱う環境でそのまま配置できます
+
+## Vercel デプロイ
+
+このプロジェクトは `Vercel` での静的配信を前提に構成しています。
+
+- フロントエンドは `Vite` のビルド結果 `dist/` をそのまま配信
+- フィードバック送信は `api/feedback.ts` を `Vercel Function` として実行
+- Webhook URL は `Vercel` の Environment Variables に設定
+
+最低限必要な環境変数:
+
+```bash
+DISCORD_FEEDBACK_WEBHOOK_URL=https://discord.com/api/webhooks/...
+```
+
+任意の環境変数:
+
+```bash
+DISCORD_FEEDBACK_THREAD_NAME=サイト内フィードバック
+DISCORD_FEEDBACK_THREAD_ID=1234567890123456789
+```
+
+デプロイ時の設定値:
+
+- Framework Preset: `Vite`
+- Build Command: `npm run build`
+- Output Directory: `dist`
+
+`vercel.json` を含めているため、通常は手動設定なしでもそのまま認識されます。
 
 ## 注意点
 
