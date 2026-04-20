@@ -1,4 +1,4 @@
-import { handleFeedbackRequest } from "../server/feedback/feedbackHandler.ts";
+import { handleFeedbackRequest } from "../server/feedback/feedbackHandler.js";
 
 const buildHeaders = () =>
   new Headers({
