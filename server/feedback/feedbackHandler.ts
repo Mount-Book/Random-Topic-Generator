@@ -14,6 +14,7 @@ const FEEDBACK_THREAD_ID_ENV_KEYS = [
 const MAX_MESSAGE_LENGTH = 1200;
 const MAX_REPRODUCTION_LENGTH = 1200;
 const MAX_CONTACT_LENGTH = 120;
+const MAX_AUTHOR_NAME_LENGTH = 60;
 const RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 3;
 const NG_WORDS = ["discord.gg/", "bit.ly/", "無料配布", "稼げる"];
@@ -21,6 +22,7 @@ const NG_WORDS = ["discord.gg/", "bit.ly/", "無料配布", "稼げる"];
 type FeedbackBody = {
   anonymousId?: string;
   appVersion?: string;
+  authorName?: string;
   contact?: string;
   honeypot?: string;
   language?: string;
@@ -127,14 +129,11 @@ const isContactValid = (value: string) => {
   }
 
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const xPattern = /^@?[A-Za-z0-9_]{1,15}$/;
-  const discordPattern =
-    /^(?:@?[A-Za-z0-9_.]{2,32}|[A-Za-z0-9_.]{2,32}#[0-9]{4})$/;
+  const genericContactPattern = /^[^\r\n<>]{2,120}$/u;
 
   return (
     emailPattern.test(value) ||
-    xPattern.test(value) ||
-    discordPattern.test(value)
+    (!value.includes("://") && genericContactPattern.test(value))
   );
 };
 
@@ -212,6 +211,7 @@ const buildDiscordPayload = (
           FeedbackBody,
           | "anonymousId"
           | "appVersion"
+          | "authorName"
           | "contact"
           | "language"
           | "pageUrl"
@@ -227,6 +227,12 @@ const buildDiscordPayload = (
   const fields = [
     ["本文", feedback.message],
     ["種別", FEEDBACK_TYPE_LABELS[feedback.type as FeedbackType]],
+    [
+      "作者",
+      feedback.type === "topic-submission"
+        ? (feedback.authorName?.trim() || "匿名")
+        : undefined,
+    ],
     ["連絡先", feedback.contact],
     [
       "再現手順",
@@ -296,6 +302,10 @@ export const handleFeedbackRequest = async ({
 
   const type = sanitizeString(parsedBody.type, 32) as FeedbackType;
   const message = sanitizeString(parsedBody.message, MAX_MESSAGE_LENGTH);
+  const authorName = sanitizeString(
+    parsedBody.authorName,
+    MAX_AUTHOR_NAME_LENGTH
+  );
   const reproductionSteps = sanitizeString(
     parsedBody.reproductionSteps,
     MAX_REPRODUCTION_LENGTH
@@ -372,6 +382,7 @@ export const handleFeedbackRequest = async ({
     ...buildDiscordPayload({
       anonymousId,
       appVersion,
+      authorName,
       contact,
       language,
       message,

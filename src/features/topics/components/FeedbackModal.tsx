@@ -3,6 +3,7 @@ import { useEffect, useState, type FormEvent } from "react";
 const FEEDBACK_MESSAGE_MAX_LENGTH = 1200;
 const FEEDBACK_REPRODUCTION_MAX_LENGTH = 1200;
 const FEEDBACK_CONTACT_MAX_LENGTH = 120;
+const FEEDBACK_AUTHOR_NAME_MAX_LENGTH = 60;
 const FEEDBACK_ANONYMOUS_ID_KEY = "feedback-anonymous-id";
 
 const feedbackTypeOptions = [
@@ -17,6 +18,7 @@ type FeedbackType = (typeof feedbackTypeOptions)[number]["value"];
 type FeedbackFormState = {
   type: FeedbackType;
   message: string;
+  authorName: string;
   reproductionSteps: string;
   contact: string;
   includeDiagnostics: boolean;
@@ -33,6 +35,7 @@ type FeedbackModalProps = {
 const createInitialFormState = (): FeedbackFormState => ({
   type: "request",
   message: "",
+  authorName: "",
   reproductionSteps: "",
   contact: "",
   includeDiagnostics: true,
@@ -50,20 +53,18 @@ const isValidContact = (value: string) => {
   }
 
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const xPattern = /^@?[A-Za-z0-9_]{1,15}$/;
-  const discordPattern =
-    /^(?:@?[A-Za-z0-9_.]{2,32}|[A-Za-z0-9_.]{2,32}#[0-9]{4})$/;
+  const genericContactPattern = /^[^\r\n<>]{2,120}$/u;
 
   return (
     emailPattern.test(trimmed) ||
-    xPattern.test(trimmed) ||
-    discordPattern.test(trimmed)
+    (!trimmed.includes("://") && genericContactPattern.test(trimmed))
   );
 };
 
 const validateForm = (form: FeedbackFormState): FeedbackFormErrors => {
   const errors: FeedbackFormErrors = {};
   const message = sanitizeText(form.message);
+  const authorName = sanitizeText(form.authorName);
   const reproductionSteps = sanitizeText(form.reproductionSteps);
 
   if (!message) {
@@ -79,11 +80,18 @@ const validateForm = (form: FeedbackFormState): FeedbackFormErrors => {
     errors.reproductionSteps = `再現手順は${FEEDBACK_REPRODUCTION_MAX_LENGTH}文字以内で入力してください。`;
   }
 
+  if (
+    form.type === "topic-submission" &&
+    authorName.length > FEEDBACK_AUTHOR_NAME_MAX_LENGTH
+  ) {
+    errors.authorName = `作者名は${FEEDBACK_AUTHOR_NAME_MAX_LENGTH}文字以内で入力してください。`;
+  }
+
   if (form.contact.trim().length > FEEDBACK_CONTACT_MAX_LENGTH) {
     errors.contact = `連絡先は${FEEDBACK_CONTACT_MAX_LENGTH}文字以内で入力してください。`;
   } else if (!isValidContact(form.contact)) {
     errors.contact =
-      "連絡先はメールアドレス、X ID、または Discord ID の形式で入力してください。";
+      "連絡先はメールアドレス、または連絡可能なアカウント名を入力してください。";
   }
 
   return errors;
@@ -188,6 +196,7 @@ export const FeedbackModal = ({ isOpen, onClose }: FeedbackModalProps) => {
         body: JSON.stringify({
           type: form.type,
           message: sanitizeText(form.message),
+          authorName: sanitizeText(form.authorName),
           reproductionSteps: sanitizeText(form.reproductionSteps),
           contact: form.contact.trim(),
           honeypot: form.honeypot,
@@ -254,165 +263,190 @@ export const FeedbackModal = ({ isOpen, onClose }: FeedbackModalProps) => {
         aria-labelledby="feedback-modal-title"
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="info-modal-header">
-          <div>
-            <p className="eyebrow">Feedback</p>
-            <h2 id="feedback-modal-title">ご意見・ご要望</h2>
-          </div>
-          <button
-            className="modal-close-button"
-            type="button"
-            onClick={handleClose}
-            aria-label="フォームを閉じる"
-          >
-            ×
-          </button>
-        </div>
-
-        <p className="feedback-modal-copy">
-          改善の参考にするため、ご意見・ご要望を受け付けています。
-          <br />
-          不具合報告の場合は、発生状況もできるだけ詳しくご記入ください。
-        </p>
-        <p className="feedback-toggle-hint">
-          全文抽出へのお題投稿は、自作のお題に限ります。第三者のネタや既存コンテンツの転載は送らないでください。
-        </p>
-
-        <form className="feedback-form" onSubmit={handleSubmit}>
-          <label className="feedback-field">
-            <span>種別</span>
-            <select
-              value={form.type}
-              onChange={(event) =>
-                updateField("type", event.currentTarget.value as FeedbackType)
-              }
+        <div className="feedback-modal-inner">
+          <div className="info-modal-header">
+            <div>
+              <p className="eyebrow">Feedback</p>
+              <h2 id="feedback-modal-title">ご意見・ご要望</h2>
+            </div>
+            <button
+              className="modal-close-button"
+              type="button"
+              onClick={handleClose}
+              aria-label="フォームを閉じる"
             >
-              {feedbackTypeOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
+              ×
+            </button>
+          </div>
 
-          <label className="feedback-field">
-            <span>内容</span>
-            <textarea
-              rows={6}
-              value={form.message}
-              onChange={(event) => updateField("message", event.target.value)}
-              maxLength={FEEDBACK_MESSAGE_MAX_LENGTH}
-              placeholder={getMessagePlaceholder(form.type)}
-              aria-invalid={Boolean(errors.message)}
-            />
-            <strong className="feedback-field-meta">
-              {form.message.length}/{FEEDBACK_MESSAGE_MAX_LENGTH}
-            </strong>
-            {errors.message ? (
-              <span className="feedback-field-error">{errors.message}</span>
-            ) : null}
-          </label>
+          <div className="feedback-modal-copy">
+            <p>改善の参考にするため、ご意見・ご要望を受け付けています。</p>
+            <p>不具合報告の場合は、発生状況もできるだけ詳しくご記入ください。</p>
+            <p className="feedback-modal-note">
+              全文抽出へのお題投稿は、自作のお題に限ります。第三者のネタや既存コンテンツの転載は送らないでください。
+            </p>
+          </div>
 
-          {form.type === "bug" ? (
+          <form className="feedback-form" onSubmit={handleSubmit}>
             <label className="feedback-field">
-              <span>再現手順</span>
-              <textarea
-                rows={5}
-                value={form.reproductionSteps}
+              <span>種別</span>
+              <select
+                value={form.type}
                 onChange={(event) =>
-                  updateField("reproductionSteps", event.target.value)
+                  updateField("type", event.currentTarget.value as FeedbackType)
                 }
-                maxLength={FEEDBACK_REPRODUCTION_MAX_LENGTH}
-                placeholder={
-                  "1. どの画面を開いたか\n2. 何を操作したか\n3. どうなったか"
-                }
-                aria-invalid={Boolean(errors.reproductionSteps)}
+              >
+                {feedbackTypeOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="feedback-field">
+              <span>内容</span>
+              <textarea
+                rows={6}
+                value={form.message}
+                onChange={(event) => updateField("message", event.target.value)}
+                maxLength={FEEDBACK_MESSAGE_MAX_LENGTH}
+                placeholder={getMessagePlaceholder(form.type)}
+                aria-invalid={Boolean(errors.message)}
               />
               <strong className="feedback-field-meta">
-                {form.reproductionSteps.length}/
-                {FEEDBACK_REPRODUCTION_MAX_LENGTH}
+                {form.message.length}/{FEEDBACK_MESSAGE_MAX_LENGTH}
               </strong>
-              {errors.reproductionSteps ? (
-                <span className="feedback-field-error">
-                  {errors.reproductionSteps}
-                </span>
+              {errors.message ? (
+                <span className="feedback-field-error">{errors.message}</span>
               ) : null}
             </label>
-          ) : null}
 
-          <label className="feedback-field">
-            <span>連絡先</span>
-            <input
-              type="text"
-              value={form.contact}
-              onChange={(event) => updateField("contact", event.target.value)}
-              maxLength={FEEDBACK_CONTACT_MAX_LENGTH}
-              placeholder="example@example.com / @your_id / yourname"
-              aria-invalid={Boolean(errors.contact)}
-            />
-            <small className="feedback-field-hint">
-              任意です。メールアドレス、X ID、Discord ID
-              のいずれかを入力できます。
-            </small>
-            {errors.contact ? (
-              <span className="feedback-field-error">{errors.contact}</span>
+            {form.type === "topic-submission" ? (
+              <label className="feedback-field">
+                <span>作者名</span>
+                <input
+                  type="text"
+                  value={form.authorName}
+                  onChange={(event) =>
+                    updateField("authorName", event.target.value)
+                  }
+                  maxLength={FEEDBACK_AUTHOR_NAME_MAX_LENGTH}
+                  placeholder="お名前・ペンネーム"
+                  aria-invalid={Boolean(errors.authorName)}
+                />
+                <small className="feedback-field-hint">
+                  任意です。無記入の場合は「作者：匿名」と記載します。
+                </small>
+                {errors.authorName ? (
+                  <span className="feedback-field-error">
+                    {errors.authorName}
+                  </span>
+                ) : null}
+              </label>
             ) : null}
-          </label>
 
-          <label className="feedback-toggle">
-            <input
-              type="checkbox"
-              checked={form.includeDiagnostics}
-              onChange={(event) =>
-                updateField("includeDiagnostics", event.target.checked)
-              }
-            />
-            <span>
-              発生ページ、ブラウザ情報、画面サイズなどの利用環境を自動共有する
-            </span>
-          </label>
-          <p className="feedback-toggle-hint">
-            初期状態ではオンです。オフにすると、内容と連絡先だけを送信します。
-          </p>
+            {form.type === "bug" ? (
+              <label className="feedback-field">
+                <span>再現手順</span>
+                <textarea
+                  rows={5}
+                  value={form.reproductionSteps}
+                  onChange={(event) =>
+                    updateField("reproductionSteps", event.target.value)
+                  }
+                  maxLength={FEEDBACK_REPRODUCTION_MAX_LENGTH}
+                  placeholder={
+                    "1. どの画面を開いたか\n2. 何を操作したか\n3. どうなったか"
+                  }
+                  aria-invalid={Boolean(errors.reproductionSteps)}
+                />
+                <strong className="feedback-field-meta">
+                  {form.reproductionSteps.length}/
+                  {FEEDBACK_REPRODUCTION_MAX_LENGTH}
+                </strong>
+                {errors.reproductionSteps ? (
+                  <span className="feedback-field-error">
+                    {errors.reproductionSteps}
+                  </span>
+                ) : null}
+              </label>
+            ) : null}
 
-          <label className="feedback-honeypot" aria-hidden="true">
-            <span>入力しないでください</span>
-            <input
-              tabIndex={-1}
-              autoComplete="off"
-              value={form.honeypot}
-              onChange={(event) => updateField("honeypot", event.target.value)}
-            />
-          </label>
+            <label className="feedback-field">
+              <span>連絡先</span>
+              <input
+                type="text"
+                value={form.contact}
+                onChange={(event) => updateField("contact", event.target.value)}
+                maxLength={FEEDBACK_CONTACT_MAX_LENGTH}
+                placeholder="example@example.com / @your_id / VRChat名"
+                aria-invalid={Boolean(errors.contact)}
+              />
+              <small className="feedback-field-hint">
+                任意です。メールアドレス、X ID、Discord
+                ID、VRChatアカウント名など、連絡可能な情報を入力できます。
+              </small>
+              {errors.contact ? (
+                <span className="feedback-field-error">{errors.contact}</span>
+              ) : null}
+            </label>
 
-          <div className="feedback-form-footer">
-            <div
-              className={`feedback-status feedback-status-${submitState}`}
-              aria-live="polite"
-            >
-              {statusMessage ||
-                (form.includeDiagnostics
-                  ? "発生ページや利用環境は送信時に自動で付与されます。"
-                  : "利用環境の自動共有はオフです。")}
-            </div>
-            <div className="feedback-form-actions">
-              <button
-                className="secondary-ghost-button"
-                type="button"
-                onClick={handleClose}
+            <label className="feedback-toggle">
+              <input
+                type="checkbox"
+                checked={form.includeDiagnostics}
+                onChange={(event) =>
+                  updateField("includeDiagnostics", event.target.checked)
+                }
+              />
+              <span>
+                発生ページ、ブラウザ情報、画面サイズなどの利用環境を自動共有する
+              </span>
+            </label>
+            <p className="feedback-toggle-hint">
+              初期状態ではオンです。オフにすると、内容と連絡先だけを送信します。
+            </p>
+
+            <label className="feedback-honeypot" aria-hidden="true">
+              <span>入力しないでください</span>
+              <input
+                tabIndex={-1}
+                autoComplete="off"
+                value={form.honeypot}
+                onChange={(event) => updateField("honeypot", event.target.value)}
+              />
+            </label>
+
+            <div className="feedback-form-footer">
+              <div
+                className={`feedback-status feedback-status-${submitState}`}
+                aria-live="polite"
               >
-                閉じる
-              </button>
-              <button
-                className="primary-button"
-                type="submit"
-                disabled={submitState === "submitting"}
-              >
-                {submitState === "submitting" ? "送信中..." : "送信"}
-              </button>
+                {statusMessage ||
+                  (form.includeDiagnostics
+                    ? "発生ページや利用環境は送信時に自動で付与されます。"
+                    : "利用環境の自動共有はオフです。")}
+              </div>
+              <div className="feedback-form-actions">
+                <button
+                  className="secondary-ghost-button"
+                  type="button"
+                  onClick={handleClose}
+                >
+                  閉じる
+                </button>
+                <button
+                  className="primary-button"
+                  type="submit"
+                  disabled={submitState === "submitting"}
+                >
+                  {submitState === "submitting" ? "送信中..." : "送信"}
+                </button>
+              </div>
             </div>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );
