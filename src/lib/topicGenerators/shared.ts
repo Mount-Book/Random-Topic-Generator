@@ -27,12 +27,21 @@ type SlotDefinition = {
   category: CategoryName
 }
 
+type SlotConstraint = {
+  requiredTags?: WordTag[]
+  preferredTags?: WordTag[]
+  excludedTags?: WordTag[]
+  inheritTagsFromSlots?: string[]
+  minSharedInheritedTags?: number
+}
+
 export type TemplateDefinition = {
   id: string
   text: string
   slots: SlotDefinition[]
   weight: number
   tags: TemplateTag[]
+  slotConstraints?: Record<string, SlotConstraint>
 }
 
 export type FullTopicDefinition = {
@@ -148,6 +157,33 @@ export const templateIdsByGenre: Record<TopicGenre, string[]> = {
   scenario: ['situation-reason-medium', 'urgent-review-long', 'ceremony-action-medium'],
 }
 
+const genericInheritedTags = new Set([
+  'authority',
+  'crowd',
+  'daily',
+  'familiar',
+  'formal',
+  'heroic',
+  'popular',
+  'public',
+  'serious',
+  'service',
+  'social',
+])
+
+const conflictingTags: Record<string, string[]> = {
+  chaotic: ['formal', 'medical', 'ritual', 'serious', 'work'],
+  digital: ['historical'],
+  fantasy: ['daily', 'medical', 'school', 'work'],
+  historical: ['daily', 'digital', 'medical', 'modern', 'school', 'work'],
+  medical: ['chaotic'],
+  modern: ['historical'],
+  ritual: ['chaotic'],
+  school: ['fantasy', 'historical'],
+  serious: ['chaotic'],
+  work: ['chaotic', 'fantasy', 'historical'],
+}
+
 export const pickWeighted = <T,>(list: T[], getWeight: (value: T) => number) => {
   const weighted = list.map((value) => ({ value, weight: Math.max(0.01, getWeight(value)) }))
   const total = weighted.reduce((sum, item) => sum + item.weight, 0)
@@ -167,6 +203,31 @@ export const pickRandom = <T,>(list: T[]) => list[Math.floor(Math.random() * lis
 
 const intersect = <T,>(left: T[], right: T[]) => left.filter((value) => right.includes(value))
 
+const unique = <T,>(list: T[]) => [...new Set(list)]
+
+const collectInheritedTags = (
+  selectedWords: Record<string, WordEntry>,
+  sourceSlots: string[] | undefined,
+) =>
+  unique(
+    (sourceSlots ?? []).flatMap((slotKey) => selectedWords[slotKey]?.tags ?? []),
+  )
+
+const getMeaningfulInheritedTags = (tags: WordTag[]) =>
+  tags.filter((tag) => !genericInheritedTags.has(tag))
+
+const countSharedInheritedTags = (candidate: WordEntry, inheritedTags: WordTag[]) =>
+  intersect(candidate.tags, inheritedTags).length
+
+const hasConflictingTags = (candidateTags: WordTag[], contextTags: WordTag[]) =>
+  candidateTags.some((candidateTag) =>
+    contextTags.some((contextTag) => {
+      const candidateConflicts = conflictingTags[candidateTag] ?? []
+      const contextConflicts = conflictingTags[contextTag] ?? []
+      return candidateConflicts.includes(contextTag) || contextConflicts.includes(candidateTag)
+    }),
+  )
+
 export const renderTemplate = (
   template: TemplateDefinition,
   selectedWords: Record<string, WordEntry>,
@@ -184,10 +245,86 @@ export const renderTemplate = (
     return word.text
   })
 
-export const buildSelectedWords = (template: TemplateDefinition) =>
-  Object.fromEntries(
-    template.slots.map((slot) => [slot.key, pickWeighted(lexicon[slot.category], (word) => word.weight)]),
-  ) as Record<string, WordEntry>
+type ResolvedWordCandidate = {
+  word: WordEntry
+  weight: number
+}
+
+export const resolveSlotCandidates = (
+  categoryWords: WordEntry[],
+  slotConstraint: SlotConstraint | undefined,
+  selectedWords: Record<string, WordEntry>,
+) => {
+  const requiredTags = slotConstraint?.requiredTags ?? []
+  const excludedTags = slotConstraint?.excludedTags ?? []
+  const preferredTags = slotConstraint?.preferredTags ?? []
+  const inheritedTags = collectInheritedTags(selectedWords, slotConstraint?.inheritTagsFromSlots)
+  const meaningfulInheritedTags = getMeaningfulInheritedTags(inheritedTags)
+
+  const baseFiltered = categoryWords.filter((word) => {
+    if (requiredTags.some((tag) => !word.tags.includes(tag))) {
+      return false
+    }
+
+    if (excludedTags.some((tag) => word.tags.includes(tag))) {
+      return false
+    }
+
+    if (inheritedTags.length > 0 && hasConflictingTags(word.tags, inheritedTags)) {
+      return false
+    }
+
+    return true
+  })
+
+  const minSharedInheritedTags = slotConstraint?.minSharedInheritedTags ?? 0
+  const contextFiltered =
+    minSharedInheritedTags > 0 && meaningfulInheritedTags.length > 0
+      ? baseFiltered.filter(
+          (word) => countSharedInheritedTags(word, meaningfulInheritedTags) >= minSharedInheritedTags,
+        )
+      : baseFiltered
+
+  const resolved = (contextFiltered.length > 0 ? contextFiltered : baseFiltered).map((word) => {
+    const preferredMatches = countSharedInheritedTags(word, preferredTags)
+    const inheritedMatches = countSharedInheritedTags(word, inheritedTags)
+    const meaningfulMatches = countSharedInheritedTags(word, meaningfulInheritedTags)
+    const genericOnlyMismatch =
+      inheritedTags.length > 0 && inheritedMatches === 0 && meaningfulInheritedTags.length > 0 ? 0.45 : 1
+
+    return {
+      word,
+      weight:
+        Math.max(
+          0.05,
+          (word.weight + preferredMatches * 1.8 + inheritedMatches * 2.4 + meaningfulMatches * 1.6) *
+            genericOnlyMismatch,
+        ),
+    }
+  })
+
+  if (resolved.length === 0) {
+    throw new Error('条件に合うワード候補がありません')
+  }
+
+  return resolved
+}
+
+export const buildSelectedWords = (template: TemplateDefinition) => {
+  const selectedWords: Record<string, WordEntry> = {}
+
+  for (const slot of template.slots) {
+    const resolvedCandidates: ResolvedWordCandidate[] = resolveSlotCandidates(
+      lexicon[slot.category],
+      template.slotConstraints?.[slot.key],
+      selectedWords,
+    )
+
+    selectedWords[slot.key] = pickWeighted(resolvedCandidates, (candidate) => candidate.weight).word
+  }
+
+  return selectedWords
+}
 
 export const getWordPairs = (selectedWords: Record<string, WordEntry>) => {
   const entries = Object.entries(selectedWords)

@@ -25,6 +25,12 @@
       { "key": "situation", "category": "situation" },
       { "key": "action", "category": "action" }
     ],
+    "slotConstraints": {
+      "action": {
+        "inheritTagsFromSlots": ["situation"],
+        "minSharedInheritedTags": 1
+      }
+    },
     "weight": 1.15,
     "tags": ["reason", "medium", "expansive"]
   },
@@ -45,6 +51,12 @@
       { "key": "place", "category": "place" },
       { "key": "person", "category": "person" }
     ],
+    "slotConstraints": {
+      "person": {
+        "inheritTagsFromSlots": ["place"],
+        "excludedTags": ["fantasy"]
+      }
+    },
     "weight": 1,
     "tags": ["line", "medium", "social"]
   },
@@ -56,6 +68,15 @@
       { "key": "modern", "category": "modern" },
       { "key": "person", "category": "person" }
     ],
+    "slotConstraints": {
+      "modern": {
+        "inheritTagsFromSlots": ["situation"],
+        "minSharedInheritedTags": 1
+      },
+      "person": {
+        "inheritTagsFromSlots": ["situation", "modern"]
+      }
+    },
     "weight": 0.95,
     "tags": ["reason", "long", "contrast"]
   },
@@ -67,6 +88,17 @@
       { "key": "action", "category": "action" },
       { "key": "person", "category": "person" }
     ],
+    "slotConstraints": {
+      "action": {
+        "inheritTagsFromSlots": ["place"],
+        "minSharedInheritedTags": 1
+      },
+      "person": {
+        "inheritTagsFromSlots": ["place", "action"],
+        "minSharedInheritedTags": 1,
+        "excludedTags": ["fantasy"]
+      }
+    },
     "weight": 1,
     "tags": ["scene", "medium", "social"]
   },
@@ -78,6 +110,12 @@
       { "key": "modern", "category": "modern" },
       { "key": "person", "category": "person" }
     ],
+    "slotConstraints": {
+      "person": {
+        "inheritTagsFromSlots": ["job", "modern"],
+        "excludedTags": ["fantasy"]
+      }
+    },
     "weight": 1,
     "tags": ["role-swap", "long", "contrast"]
   }
