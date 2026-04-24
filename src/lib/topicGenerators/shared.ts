@@ -27,12 +27,36 @@ type SlotDefinition = {
   category: CategoryName
 }
 
+type SlotConstraint = {
+  requiredTags?: WordTag[]
+  requiredAnyTagSets?: WordTag[][]
+  preferredTags?: WordTag[]
+  excludedTags?: WordTag[]
+  inheritTagsFromSlots?: string[]
+  minSharedInheritedTags?: number
+  minSharedMeaningfulTags?: number
+  genericOnlyWeightMultiplier?: number
+  disallowGenericOnlyMatches?: boolean
+  requiredTagsWhenSourceHasTags?: Array<{
+    sourceSlot: string
+    sourceTags: WordTag[]
+    requiredTags?: WordTag[]
+    requiredAnyTagSets?: WordTag[][]
+  }>
+  excludedTagPairs?: Array<{
+    sourceSlot: string
+    sourceTags: WordTag[]
+    candidateTags: WordTag[]
+  }>
+}
+
 export type TemplateDefinition = {
   id: string
   text: string
   slots: SlotDefinition[]
   weight: number
   tags: TemplateTag[]
+  slotConstraints?: Record<string, SlotConstraint>
 }
 
 export type FullTopicDefinition = {
@@ -134,8 +158,10 @@ const clarityCategoryBonus: Record<string, number> = {
   person: 1.3,
   job: 1.2,
   place: 1.4,
+  noun: 1.35,
   situation: 1.4,
   action: 1.2,
+  adjective: 1.1,
   modern: 1,
 }
 
@@ -143,9 +169,62 @@ export const topicGenreCycle = ['line', 'mismatch', 'scenario'] as const
 export type TopicGenre = (typeof topicGenreCycle)[number]
 
 export const templateIdsByGenre: Record<TopicGenre, string[]> = {
-  line: ['forbidden-line-short', 'public-slip-medium'],
-  mismatch: ['role-swap-short', 'modern-mix-medium', 'job-modern-long'],
-  scenario: ['situation-reason-medium', 'urgent-review-long', 'ceremony-action-medium'],
+  line: [
+    'forbidden-line-short',
+    'public-slip-medium',
+    'situation-person-line-medium',
+    'situation-action-excuse-medium',
+    'place-warning-short',
+    'person-situation-check-medium',
+  ],
+  mismatch: [
+    'role-swap-short',
+    'adjective-place-short',
+    'modern-mix-medium',
+    'job-modern-long',
+    'person-place-reason-medium',
+    'job-action-reason-medium',
+    'place-modern-usage-medium',
+    'person-modern-misread-medium',
+    'modern-place-weird-medium',
+    'person-job-talent-short',
+  ],
+  scenario: [
+    'situation-reason-medium',
+    'urgent-review-long',
+    'ceremony-action-medium',
+    'place-person-incident-short',
+    'place-action-person-reaction-long',
+    'situation-person-calm-medium',
+    'job-place-secret-medium',
+  ],
+}
+
+const genericInheritedTags = new Set([
+  'authority',
+  'crowd',
+  'daily',
+  'familiar',
+  'formal',
+  'heroic',
+  'popular',
+  'public',
+  'serious',
+  'service',
+  'social',
+])
+
+const conflictingTags: Record<string, string[]> = {
+  chaotic: ['formal', 'medical', 'ritual', 'serious', 'work'],
+  digital: ['historical'],
+  fantasy: ['daily', 'medical', 'school', 'work'],
+  historical: ['daily', 'digital', 'medical', 'modern', 'school', 'work'],
+  medical: ['chaotic'],
+  modern: ['historical'],
+  ritual: ['chaotic'],
+  school: ['fantasy', 'historical'],
+  serious: ['chaotic'],
+  work: ['chaotic', 'fantasy', 'historical'],
 }
 
 export const pickWeighted = <T,>(list: T[], getWeight: (value: T) => number) => {
@@ -167,6 +246,51 @@ export const pickRandom = <T,>(list: T[]) => list[Math.floor(Math.random() * lis
 
 const intersect = <T,>(left: T[], right: T[]) => left.filter((value) => right.includes(value))
 
+const unique = <T,>(list: T[]) => [...new Set(list)]
+
+const collectInheritedTags = (
+  selectedWords: Record<string, WordEntry>,
+  sourceSlots: string[] | undefined,
+) =>
+  unique(
+    (sourceSlots ?? []).flatMap((slotKey) => selectedWords[slotKey]?.tags ?? []),
+  )
+
+const getMeaningfulInheritedTags = (tags: WordTag[]) =>
+  tags.filter((tag) => !genericInheritedTags.has(tag))
+
+const countSharedInheritedTags = (candidate: WordEntry, inheritedTags: WordTag[]) =>
+  intersect(candidate.tags, inheritedTags).length
+
+const matchesRequiredAnyTagSets = (candidateTags: WordTag[], requiredAnyTagSets: WordTag[][]) =>
+  requiredAnyTagSets.every((tagSet) => tagSet.some((tag) => candidateTags.includes(tag)))
+
+const hasExcludedTagPair = (
+  candidateTags: WordTag[],
+  selectedWords: Record<string, WordEntry>,
+  excludedTagPairs: NonNullable<SlotConstraint['excludedTagPairs']>,
+) =>
+  excludedTagPairs.some((rule) => {
+    const sourceWord = selectedWords[rule.sourceSlot]
+    if (!sourceWord) {
+      return false
+    }
+
+    return (
+      rule.sourceTags.every((tag) => sourceWord.tags.includes(tag)) &&
+      rule.candidateTags.some((tag) => candidateTags.includes(tag))
+    )
+  })
+
+const hasConflictingTags = (candidateTags: WordTag[], contextTags: WordTag[]) =>
+  candidateTags.some((candidateTag) =>
+    contextTags.some((contextTag) => {
+      const candidateConflicts = conflictingTags[candidateTag] ?? []
+      const contextConflicts = conflictingTags[contextTag] ?? []
+      return candidateConflicts.includes(contextTag) || contextConflicts.includes(candidateTag)
+    }),
+  )
+
 export const renderTemplate = (
   template: TemplateDefinition,
   selectedWords: Record<string, WordEntry>,
@@ -184,10 +308,155 @@ export const renderTemplate = (
     return word.text
   })
 
-export const buildSelectedWords = (template: TemplateDefinition) =>
-  Object.fromEntries(
-    template.slots.map((slot) => [slot.key, pickWeighted(lexicon[slot.category], (word) => word.weight)]),
-  ) as Record<string, WordEntry>
+type ResolvedWordCandidate = {
+  word: WordEntry
+  weight: number
+}
+
+export const resolveSlotCandidates = (
+  categoryWords: WordEntry[],
+  slotConstraint: SlotConstraint | undefined,
+  selectedWords: Record<string, WordEntry>,
+) => {
+  const activeConditionalRules = (slotConstraint?.requiredTagsWhenSourceHasTags ?? []).filter((rule) => {
+    const sourceWord = selectedWords[rule.sourceSlot]
+    return Boolean(sourceWord && rule.sourceTags.every((tag) => sourceWord.tags.includes(tag)))
+  })
+  const conditionalRequiredTags = activeConditionalRules.flatMap((rule) => rule.requiredTags ?? [])
+  const conditionalRequiredAnyTagSets = activeConditionalRules.flatMap(
+    (rule) => rule.requiredAnyTagSets ?? [],
+  )
+  const requiredTags = [...(slotConstraint?.requiredTags ?? []), ...conditionalRequiredTags]
+  const requiredAnyTagSets = [
+    ...(slotConstraint?.requiredAnyTagSets ?? []),
+    ...conditionalRequiredAnyTagSets,
+  ]
+  const excludedTags = slotConstraint?.excludedTags ?? []
+  const preferredTags = slotConstraint?.preferredTags ?? []
+  const excludedTagPairs = slotConstraint?.excludedTagPairs ?? []
+  const inheritedTags = collectInheritedTags(selectedWords, slotConstraint?.inheritTagsFromSlots)
+  const meaningfulInheritedTags = getMeaningfulInheritedTags(inheritedTags)
+
+  const baseFiltered = categoryWords.filter((word) => {
+    if (requiredTags.some((tag) => !word.tags.includes(tag))) {
+      return false
+    }
+
+    if (!matchesRequiredAnyTagSets(word.tags, requiredAnyTagSets)) {
+      return false
+    }
+
+    if (excludedTags.some((tag) => word.tags.includes(tag))) {
+      return false
+    }
+
+    if (excludedTagPairs.length > 0 && hasExcludedTagPair(word.tags, selectedWords, excludedTagPairs)) {
+      return false
+    }
+
+    if (inheritedTags.length > 0 && hasConflictingTags(word.tags, inheritedTags)) {
+      return false
+    }
+
+    return true
+  })
+
+  const minSharedInheritedTags = slotConstraint?.minSharedInheritedTags ?? 0
+  const minSharedMeaningfulTags = slotConstraint?.minSharedMeaningfulTags ?? 0
+  const contextFiltered = baseFiltered.filter((word) => {
+    const inheritedMatches = countSharedInheritedTags(word, inheritedTags)
+    const meaningfulMatches = countSharedInheritedTags(word, meaningfulInheritedTags)
+    const hasGenericOnlyMatch =
+      inheritedTags.length > 0 &&
+      meaningfulInheritedTags.length > 0 &&
+      inheritedMatches > 0 &&
+      meaningfulMatches === 0
+
+    if (minSharedInheritedTags > 0 && inheritedMatches < minSharedInheritedTags) {
+      return false
+    }
+
+    if (minSharedMeaningfulTags > 0 && meaningfulMatches < minSharedMeaningfulTags) {
+      return false
+    }
+
+    if (slotConstraint?.disallowGenericOnlyMatches && hasGenericOnlyMatch) {
+      return false
+    }
+
+    return true
+  })
+
+  const resolved = contextFiltered.map((word) => {
+    const preferredMatches = countSharedInheritedTags(word, preferredTags)
+    const inheritedMatches = countSharedInheritedTags(word, inheritedTags)
+    const meaningfulMatches = countSharedInheritedTags(word, meaningfulInheritedTags)
+    const genericMatches = Math.max(0, inheritedMatches - meaningfulMatches)
+    const hasGenericOnlyMatch =
+      inheritedTags.length > 0 &&
+      meaningfulInheritedTags.length > 0 &&
+      inheritedMatches > 0 &&
+      meaningfulMatches === 0
+    const hasNoContextMatch = inheritedTags.length > 0 && inheritedMatches === 0
+    const genericOnlyMultiplier = hasGenericOnlyMatch
+      ? slotConstraint?.genericOnlyWeightMultiplier ?? 0.3
+      : 1
+    const noContextMultiplier = hasNoContextMatch ? 0.18 : 1
+
+    return {
+      word,
+      weight:
+        Math.max(
+          0.05,
+          (word.weight +
+            preferredMatches * 1.4 +
+            genericMatches * 0.75 +
+            inheritedMatches * 0.35 +
+            meaningfulMatches * 3.2) *
+            genericOnlyMultiplier *
+            noContextMultiplier,
+        ),
+    }
+  })
+
+  if (resolved.length === 0) {
+    throw new Error('条件に合うワード候補がありません')
+  }
+
+  return resolved
+}
+
+const buildSelectedWordsOnce = (template: TemplateDefinition) => {
+  const selectedWords: Record<string, WordEntry> = {}
+
+  for (const slot of template.slots) {
+    const resolvedCandidates: ResolvedWordCandidate[] = resolveSlotCandidates(
+      lexicon[slot.category],
+      template.slotConstraints?.[slot.key],
+      selectedWords,
+    )
+
+    selectedWords[slot.key] = pickWeighted(resolvedCandidates, (candidate) => candidate.weight).word
+  }
+
+  return selectedWords
+}
+
+const MAX_TEMPLATE_SELECTION_ATTEMPTS = 24
+
+export const buildSelectedWords = (template: TemplateDefinition) => {
+  let lastError: Error | null = null
+
+  for (let attempt = 0; attempt < MAX_TEMPLATE_SELECTION_ATTEMPTS; attempt += 1) {
+    try {
+      return buildSelectedWordsOnce(template)
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error('ワード選定に失敗しました')
+    }
+  }
+
+  throw lastError ?? new Error('ワード選定に失敗しました')
+}
 
 export const getWordPairs = (selectedWords: Record<string, WordEntry>) => {
   const entries = Object.entries(selectedWords)
