@@ -33,6 +33,11 @@ type SlotConstraint = {
   excludedTags?: WordTag[]
   inheritTagsFromSlots?: string[]
   minSharedInheritedTags?: number
+  requiredTagsWhenSourceHasTags?: Array<{
+    sourceSlot: string
+    sourceTags: WordTag[]
+    requiredTags: WordTag[]
+  }>
 }
 
 export type TemplateDefinition = {
@@ -143,8 +148,10 @@ const clarityCategoryBonus: Record<string, number> = {
   person: 1.3,
   job: 1.2,
   place: 1.4,
+  noun: 1.35,
   situation: 1.4,
   action: 1.2,
+  adjective: 1.1,
   modern: 1,
 }
 
@@ -152,9 +159,35 @@ export const topicGenreCycle = ['line', 'mismatch', 'scenario'] as const
 export type TopicGenre = (typeof topicGenreCycle)[number]
 
 export const templateIdsByGenre: Record<TopicGenre, string[]> = {
-  line: ['forbidden-line-short', 'public-slip-medium'],
-  mismatch: ['role-swap-short', 'modern-mix-medium', 'job-modern-long'],
-  scenario: ['situation-reason-medium', 'urgent-review-long', 'ceremony-action-medium'],
+  line: [
+    'forbidden-line-short',
+    'public-slip-medium',
+    'situation-person-line-medium',
+    'situation-action-excuse-medium',
+    'place-warning-short',
+    'person-situation-check-medium',
+  ],
+  mismatch: [
+    'role-swap-short',
+    'adjective-place-short',
+    'modern-mix-medium',
+    'job-modern-long',
+    'person-place-reason-medium',
+    'job-action-reason-medium',
+    'place-modern-usage-medium',
+    'person-modern-misread-medium',
+    'modern-place-weird-medium',
+    'person-job-talent-short',
+  ],
+  scenario: [
+    'situation-reason-medium',
+    'urgent-review-long',
+    'ceremony-action-medium',
+    'place-person-incident-short',
+    'place-action-person-reaction-long',
+    'situation-person-calm-medium',
+    'job-place-secret-medium',
+  ],
 }
 
 const genericInheritedTags = new Set([
@@ -255,7 +288,15 @@ export const resolveSlotCandidates = (
   slotConstraint: SlotConstraint | undefined,
   selectedWords: Record<string, WordEntry>,
 ) => {
-  const requiredTags = slotConstraint?.requiredTags ?? []
+  const conditionalRequiredTags = (slotConstraint?.requiredTagsWhenSourceHasTags ?? []).flatMap((rule) => {
+    const sourceWord = selectedWords[rule.sourceSlot]
+    if (!sourceWord) {
+      return []
+    }
+
+    return rule.sourceTags.every((tag) => sourceWord.tags.includes(tag)) ? rule.requiredTags : []
+  })
+  const requiredTags = [...(slotConstraint?.requiredTags ?? []), ...conditionalRequiredTags]
   const excludedTags = slotConstraint?.excludedTags ?? []
   const preferredTags = slotConstraint?.preferredTags ?? []
   const inheritedTags = collectInheritedTags(selectedWords, slotConstraint?.inheritTagsFromSlots)

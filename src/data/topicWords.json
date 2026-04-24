@@ -117,6 +117,33 @@
       "forms": { "teiru": "チャンネル登録をお願いしている", "start": "チャンネル登録をお願いし始めた" }
     }
   ],
+  "noun": [
+    { "id": "family-restaurant-noun", "text": "ファミレス", "tags": ["daily", "familiar", "casual", "place-noun"], "weight": 1.2 },
+    { "id": "convenience-store", "text": "コンビニ", "tags": ["daily", "familiar", "service", "place-noun"], "weight": 1.2 },
+    { "id": "chinese-restaurant", "text": "中華屋", "tags": ["daily", "familiar", "casual", "place-noun"], "weight": 1.1 },
+    { "id": "onsen-inn-noun", "text": "温泉旅館", "tags": ["travel", "daily", "familiar", "place-noun"], "weight": 1 },
+    { "id": "theme-park-noun", "text": "テーマパーク", "tags": ["showbiz", "crowd", "modern", "place-noun"], "weight": 1 },
+    { "id": "smartphone-case", "text": "スマホケース", "tags": ["digital", "modern", "daily", "product"], "weight": 1 },
+    { "id": "wireless-earbuds", "text": "ワイヤレスイヤホン", "tags": ["digital", "modern", "personal", "product"], "weight": 1 },
+    { "id": "sneakers", "text": "スニーカー", "tags": ["daily", "casual", "personal", "product"], "weight": 1.05 },
+    { "id": "frozen-food", "text": "冷凍食品", "tags": ["daily", "home", "product"], "weight": 1 },
+    { "id": "mechanical-pencil", "text": "シャーペン", "tags": ["school", "daily", "product"], "weight": 0.95 },
+    { "id": "houseplant", "text": "観葉植物", "tags": ["home", "daily", "product"], "weight": 0.95 },
+    { "id": "mug-cup", "text": "マグカップ", "tags": ["home", "daily", "product"], "weight": 0.95 }
+  ],
+  "adjective": [
+    { "id": "home-like", "text": "実家のような", "tags": ["daily", "familiar", "home", "casual", "place-like-trigger"], "weight": 1.2 },
+    { "id": "school-like", "text": "学校のような", "tags": ["school", "public", "familiar", "school-like-trigger"], "weight": 1.1 },
+    { "id": "slightly-off", "text": "なんか違う", "tags": ["daily", "awkward", "familiar"], "weight": 1.15 },
+    { "id": "suspiciously-cheap", "text": "何故か安い", "tags": ["daily", "product", "cheap-trigger"], "weight": 1.05 },
+    { "id": "solemn", "text": "妙に厳かな", "tags": ["formal", "ceremony", "ritual", "serious"], "weight": 1 },
+    { "id": "bureaucratic", "text": "役所っぽい", "tags": ["public", "formal", "work", "modern", "place-like-trigger"], "weight": 1 },
+    { "id": "theme-park-like", "text": "テーマパークみたいな", "tags": ["showbiz", "crowd", "modern", "place-like-trigger"], "weight": 0.95 },
+    { "id": "too-medical", "text": "病院っぽすぎる", "tags": ["medical", "serious", "public", "place-like-trigger"], "weight": 0.9 },
+    { "id": "school-trip-like", "text": "修学旅行みたいな", "tags": ["school", "travel", "crowd"], "weight": 0.95 },
+    { "id": "tense", "text": "張りつめた空気の", "tags": ["serious", "formal", "crowd"], "weight": 0.9 },
+    { "id": "lived-in", "text": "やけに生活感のある", "tags": ["daily", "familiar", "home"], "weight": 1 }
+  ],
   "modern": [
     { "id": "smartphone", "text": "スマホ", "tags": ["digital", "modern", "daily"], "weight": 1.2 },
     { "id": "qrpay", "text": "QR決済", "tags": ["digital", "modern", "service"], "weight": 1 },
