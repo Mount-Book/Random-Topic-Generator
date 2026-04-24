@@ -29,14 +29,24 @@ type SlotDefinition = {
 
 type SlotConstraint = {
   requiredTags?: WordTag[]
+  requiredAnyTagSets?: WordTag[][]
   preferredTags?: WordTag[]
   excludedTags?: WordTag[]
   inheritTagsFromSlots?: string[]
   minSharedInheritedTags?: number
+  minSharedMeaningfulTags?: number
+  genericOnlyWeightMultiplier?: number
+  disallowGenericOnlyMatches?: boolean
   requiredTagsWhenSourceHasTags?: Array<{
     sourceSlot: string
     sourceTags: WordTag[]
-    requiredTags: WordTag[]
+    requiredTags?: WordTag[]
+    requiredAnyTagSets?: WordTag[][]
+  }>
+  excludedTagPairs?: Array<{
+    sourceSlot: string
+    sourceTags: WordTag[]
+    candidateTags: WordTag[]
   }>
 }
 
@@ -252,6 +262,26 @@ const getMeaningfulInheritedTags = (tags: WordTag[]) =>
 const countSharedInheritedTags = (candidate: WordEntry, inheritedTags: WordTag[]) =>
   intersect(candidate.tags, inheritedTags).length
 
+const matchesRequiredAnyTagSets = (candidateTags: WordTag[], requiredAnyTagSets: WordTag[][]) =>
+  requiredAnyTagSets.every((tagSet) => tagSet.some((tag) => candidateTags.includes(tag)))
+
+const hasExcludedTagPair = (
+  candidateTags: WordTag[],
+  selectedWords: Record<string, WordEntry>,
+  excludedTagPairs: NonNullable<SlotConstraint['excludedTagPairs']>,
+) =>
+  excludedTagPairs.some((rule) => {
+    const sourceWord = selectedWords[rule.sourceSlot]
+    if (!sourceWord) {
+      return false
+    }
+
+    return (
+      rule.sourceTags.every((tag) => sourceWord.tags.includes(tag)) &&
+      rule.candidateTags.some((tag) => candidateTags.includes(tag))
+    )
+  })
+
 const hasConflictingTags = (candidateTags: WordTag[], contextTags: WordTag[]) =>
   candidateTags.some((candidateTag) =>
     contextTags.some((contextTag) => {
@@ -288,17 +318,22 @@ export const resolveSlotCandidates = (
   slotConstraint: SlotConstraint | undefined,
   selectedWords: Record<string, WordEntry>,
 ) => {
-  const conditionalRequiredTags = (slotConstraint?.requiredTagsWhenSourceHasTags ?? []).flatMap((rule) => {
+  const activeConditionalRules = (slotConstraint?.requiredTagsWhenSourceHasTags ?? []).filter((rule) => {
     const sourceWord = selectedWords[rule.sourceSlot]
-    if (!sourceWord) {
-      return []
-    }
-
-    return rule.sourceTags.every((tag) => sourceWord.tags.includes(tag)) ? rule.requiredTags : []
+    return Boolean(sourceWord && rule.sourceTags.every((tag) => sourceWord.tags.includes(tag)))
   })
+  const conditionalRequiredTags = activeConditionalRules.flatMap((rule) => rule.requiredTags ?? [])
+  const conditionalRequiredAnyTagSets = activeConditionalRules.flatMap(
+    (rule) => rule.requiredAnyTagSets ?? [],
+  )
   const requiredTags = [...(slotConstraint?.requiredTags ?? []), ...conditionalRequiredTags]
+  const requiredAnyTagSets = [
+    ...(slotConstraint?.requiredAnyTagSets ?? []),
+    ...conditionalRequiredAnyTagSets,
+  ]
   const excludedTags = slotConstraint?.excludedTags ?? []
   const preferredTags = slotConstraint?.preferredTags ?? []
+  const excludedTagPairs = slotConstraint?.excludedTagPairs ?? []
   const inheritedTags = collectInheritedTags(selectedWords, slotConstraint?.inheritTagsFromSlots)
   const meaningfulInheritedTags = getMeaningfulInheritedTags(inheritedTags)
 
@@ -307,7 +342,15 @@ export const resolveSlotCandidates = (
       return false
     }
 
+    if (!matchesRequiredAnyTagSets(word.tags, requiredAnyTagSets)) {
+      return false
+    }
+
     if (excludedTags.some((tag) => word.tags.includes(tag))) {
+      return false
+    }
+
+    if (excludedTagPairs.length > 0 && hasExcludedTagPair(word.tags, selectedWords, excludedTagPairs)) {
       return false
     }
 
@@ -319,27 +362,59 @@ export const resolveSlotCandidates = (
   })
 
   const minSharedInheritedTags = slotConstraint?.minSharedInheritedTags ?? 0
-  const contextFiltered =
-    minSharedInheritedTags > 0 && meaningfulInheritedTags.length > 0
-      ? baseFiltered.filter(
-          (word) => countSharedInheritedTags(word, meaningfulInheritedTags) >= minSharedInheritedTags,
-        )
-      : baseFiltered
+  const minSharedMeaningfulTags = slotConstraint?.minSharedMeaningfulTags ?? 0
+  const contextFiltered = baseFiltered.filter((word) => {
+    const inheritedMatches = countSharedInheritedTags(word, inheritedTags)
+    const meaningfulMatches = countSharedInheritedTags(word, meaningfulInheritedTags)
+    const hasGenericOnlyMatch =
+      inheritedTags.length > 0 &&
+      meaningfulInheritedTags.length > 0 &&
+      inheritedMatches > 0 &&
+      meaningfulMatches === 0
 
-  const resolved = (contextFiltered.length > 0 ? contextFiltered : baseFiltered).map((word) => {
+    if (minSharedInheritedTags > 0 && inheritedMatches < minSharedInheritedTags) {
+      return false
+    }
+
+    if (minSharedMeaningfulTags > 0 && meaningfulMatches < minSharedMeaningfulTags) {
+      return false
+    }
+
+    if (slotConstraint?.disallowGenericOnlyMatches && hasGenericOnlyMatch) {
+      return false
+    }
+
+    return true
+  })
+
+  const resolved = contextFiltered.map((word) => {
     const preferredMatches = countSharedInheritedTags(word, preferredTags)
     const inheritedMatches = countSharedInheritedTags(word, inheritedTags)
     const meaningfulMatches = countSharedInheritedTags(word, meaningfulInheritedTags)
-    const genericOnlyMismatch =
-      inheritedTags.length > 0 && inheritedMatches === 0 && meaningfulInheritedTags.length > 0 ? 0.45 : 1
+    const genericMatches = Math.max(0, inheritedMatches - meaningfulMatches)
+    const hasGenericOnlyMatch =
+      inheritedTags.length > 0 &&
+      meaningfulInheritedTags.length > 0 &&
+      inheritedMatches > 0 &&
+      meaningfulMatches === 0
+    const hasNoContextMatch = inheritedTags.length > 0 && inheritedMatches === 0
+    const genericOnlyMultiplier = hasGenericOnlyMatch
+      ? slotConstraint?.genericOnlyWeightMultiplier ?? 0.3
+      : 1
+    const noContextMultiplier = hasNoContextMatch ? 0.18 : 1
 
     return {
       word,
       weight:
         Math.max(
           0.05,
-          (word.weight + preferredMatches * 1.8 + inheritedMatches * 2.4 + meaningfulMatches * 1.6) *
-            genericOnlyMismatch,
+          (word.weight +
+            preferredMatches * 1.4 +
+            genericMatches * 0.75 +
+            inheritedMatches * 0.35 +
+            meaningfulMatches * 3.2) *
+            genericOnlyMultiplier *
+            noContextMultiplier,
         ),
     }
   })
@@ -351,7 +426,7 @@ export const resolveSlotCandidates = (
   return resolved
 }
 
-export const buildSelectedWords = (template: TemplateDefinition) => {
+const buildSelectedWordsOnce = (template: TemplateDefinition) => {
   const selectedWords: Record<string, WordEntry> = {}
 
   for (const slot of template.slots) {
@@ -365,6 +440,22 @@ export const buildSelectedWords = (template: TemplateDefinition) => {
   }
 
   return selectedWords
+}
+
+const MAX_TEMPLATE_SELECTION_ATTEMPTS = 24
+
+export const buildSelectedWords = (template: TemplateDefinition) => {
+  let lastError: Error | null = null
+
+  for (let attempt = 0; attempt < MAX_TEMPLATE_SELECTION_ATTEMPTS; attempt += 1) {
+    try {
+      return buildSelectedWordsOnce(template)
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error('ワード選定に失敗しました')
+    }
+  }
+
+  throw lastError ?? new Error('ワード選定に失敗しました')
 }
 
 export const getWordPairs = (selectedWords: Record<string, WordEntry>) => {

@@ -1,37 +1,37 @@
 {
   "person": [
-    { "id": "shogun", "text": "将軍", "tags": ["historical", "authority", "public", "war"], "weight": 1.1 },
-    { "id": "principal", "text": "校長", "tags": ["school", "authority", "public"], "weight": 1.1 },
-    { "id": "dark-lord", "text": "魔王", "tags": ["fantasy", "authority", "villain"], "weight": 1 },
-    { "id": "astronaut", "text": "宇宙飛行士", "tags": ["science", "heroic", "public"], "weight": 1 },
-    { "id": "monk", "text": "お坊さん", "tags": ["formal", "ritual", "public", "religious"], "weight": 1 },
-    { "id": "idol", "text": "アイドル", "tags": ["showbiz", "popular", "modern"], "weight": 1 },
-    { "id": "detective", "text": "刑事", "tags": ["public", "serious", "investigation"], "weight": 1 },
-    { "id": "grandma", "text": "おばあちゃん", "tags": ["daily", "familiar", "home"], "weight": 1.2 },
-    { "id": "transfer-student", "text": "転校生", "tags": ["school", "daily", "familiar"], "weight": 1.1 },
-    { "id": "announcer", "text": "アナウンサー", "tags": ["public", "media", "formal"], "weight": 1 }
+    { "id": "shogun", "text": "将軍", "tags": ["historical", "authority", "public", "war", "authority-role"], "weight": 1.1 },
+    { "id": "principal", "text": "校長", "tags": ["school", "authority", "public", "school-role", "authority-role"], "weight": 1.1 },
+    { "id": "dark-lord", "text": "魔王", "tags": ["fantasy", "authority", "villain", "authority-role"], "weight": 1 },
+    { "id": "astronaut", "text": "宇宙飛行士", "tags": ["science", "heroic", "public", "science-role"], "weight": 1 },
+    { "id": "monk", "text": "お坊さん", "tags": ["formal", "ritual", "public", "religious", "ritual-role", "ceremony-role"], "weight": 1 },
+    { "id": "idol", "text": "アイドル", "tags": ["showbiz", "popular", "modern", "showbiz-role", "media-role"], "weight": 1 },
+    { "id": "detective", "text": "刑事", "tags": ["public", "serious", "investigation", "specialist-role"], "weight": 1 },
+    { "id": "grandma", "text": "おばあちゃん", "tags": ["daily", "familiar", "home", "care-role", "casual"], "weight": 1.2 },
+    { "id": "transfer-student", "text": "転校生", "tags": ["school", "daily", "familiar", "student-role", "school-role"], "weight": 1.1 },
+    { "id": "announcer", "text": "アナウンサー", "tags": ["public", "media", "formal", "media-role", "formal-role"], "weight": 1 }
   ],
   "job": [
-    { "id": "clerk", "text": "コンビニ店員", "tags": ["retail", "daily", "service"], "weight": 1.2 },
-    { "id": "youtuber", "text": "YouTuber", "tags": ["digital", "media", "modern"], "weight": 1.1 },
-    { "id": "nursery", "text": "保育士", "tags": ["care", "daily", "public"], "weight": 1 },
-    { "id": "lawyer", "text": "弁護士", "tags": ["formal", "public", "serious"], "weight": 1 },
-    { "id": "delivery", "text": "配達員", "tags": ["daily", "service", "moving"], "weight": 1 },
-    { "id": "wedding-planner", "text": "ウェディングプランナー", "tags": ["ceremony", "formal", "service"], "weight": 0.95 },
-    { "id": "barber", "text": "理容師", "tags": ["daily", "service", "familiar"], "weight": 1 },
-    { "id": "zookeeper", "text": "飼育員", "tags": ["animal", "public", "familiar"], "weight": 0.95 }
+    { "id": "clerk", "text": "コンビニ店員", "tags": ["retail", "daily", "service", "service-role"], "weight": 1.2 },
+    { "id": "youtuber", "text": "YouTuber", "tags": ["digital", "media", "modern", "media-role", "creator-role"], "weight": 1.1 },
+    { "id": "nursery", "text": "保育士", "tags": ["care", "daily", "public", "care-role", "school-role"], "weight": 1 },
+    { "id": "lawyer", "text": "弁護士", "tags": ["formal", "public", "serious", "formal-role", "specialist-role"], "weight": 1 },
+    { "id": "delivery", "text": "配達員", "tags": ["daily", "service", "moving", "service-role"], "weight": 1 },
+    { "id": "wedding-planner", "text": "ウェディングプランナー", "tags": ["ceremony", "formal", "service", "ceremony-role", "service-role"], "weight": 0.95 },
+    { "id": "barber", "text": "理容師", "tags": ["daily", "service", "familiar", "service-role"], "weight": 1 },
+    { "id": "zookeeper", "text": "飼育員", "tags": ["animal", "public", "familiar", "animal-role"], "weight": 0.95 }
   ],
   "place": [
-    { "id": "wedding", "text": "結婚式", "tags": ["ceremony", "formal", "crowd"], "weight": 1.1 },
-    { "id": "funeral", "text": "葬式", "tags": ["ritual", "formal", "serious"], "weight": 1.05 },
-    { "id": "court", "text": "裁判所", "tags": ["public", "formal", "serious"], "weight": 1 },
-    { "id": "classroom", "text": "教室", "tags": ["school", "daily", "familiar"], "weight": 1.2 },
-    { "id": "onsen", "text": "温泉旅館", "tags": ["travel", "daily", "familiar"], "weight": 1 },
-    { "id": "family-restaurant", "text": "ファミレス", "tags": ["daily", "familiar", "casual"], "weight": 1.2 },
-    { "id": "city-hall", "text": "市役所", "tags": ["public", "formal", "daily", "modern", "work"], "weight": 1 },
-    { "id": "theme-park", "text": "テーマパーク", "tags": ["showbiz", "crowd", "modern"], "weight": 1 },
-    { "id": "maternity", "text": "産婦人科の待合室", "tags": ["medical", "serious", "public"], "weight": 0.8 },
-    { "id": "school-assembly", "text": "朝礼", "tags": ["school", "formal", "crowd"], "weight": 1 }
+    { "id": "wedding", "text": "結婚式", "tags": ["ceremony", "formal", "crowd", "ceremony-role", "service-role"], "weight": 1.1 },
+    { "id": "funeral", "text": "葬式", "tags": ["ritual", "formal", "serious", "ritual-role", "ceremony-role"], "weight": 1.05 },
+    { "id": "court", "text": "裁判所", "tags": ["public", "formal", "serious", "authority-role", "formal-role"], "weight": 1 },
+    { "id": "classroom", "text": "教室", "tags": ["school", "daily", "familiar", "school-role", "student-role"], "weight": 1.2 },
+    { "id": "onsen", "text": "温泉旅館", "tags": ["travel", "daily", "familiar", "travel-role", "service-role", "casual"], "weight": 1 },
+    { "id": "family-restaurant", "text": "ファミレス", "tags": ["daily", "familiar", "casual", "service-role"], "weight": 1.2 },
+    { "id": "city-hall", "text": "市役所", "tags": ["public", "formal", "daily", "modern", "work", "authority-role", "formal-role"], "weight": 1 },
+    { "id": "theme-park", "text": "テーマパーク", "tags": ["showbiz", "crowd", "modern", "showbiz-role", "service-role"], "weight": 1 },
+    { "id": "maternity", "text": "産婦人科の待合室", "tags": ["medical", "serious", "public", "care-role", "formal-role"], "weight": 0.8 },
+    { "id": "school-assembly", "text": "朝礼", "tags": ["school", "formal", "crowd", "school-role", "student-role"], "weight": 1 }
   ],
   "situation": [
     { "id": "world-end", "text": "世界滅亡直前", "tags": ["crisis", "dramatic", "fantasy"], "weight": 1 },
@@ -145,13 +145,13 @@
     { "id": "lived-in", "text": "やけに生活感のある", "tags": ["daily", "familiar", "home"], "weight": 1 }
   ],
   "modern": [
-    { "id": "smartphone", "text": "スマホ", "tags": ["digital", "modern", "daily"], "weight": 1.2 },
-    { "id": "qrpay", "text": "QR決済", "tags": ["digital", "modern", "service"], "weight": 1 },
-    { "id": "ai", "text": "AI", "tags": ["digital", "modern", "science"], "weight": 1 },
-    { "id": "drone", "text": "ドローン", "tags": ["digital", "modern", "moving"], "weight": 0.9 },
-    { "id": "vtuber", "text": "VTuberアバター", "tags": ["digital", "media", "showbiz"], "weight": 0.95 },
-    { "id": "smartwatch", "text": "スマートウォッチ", "tags": ["digital", "modern", "daily"], "weight": 0.95 },
-    { "id": "food-delivery", "text": "フードデリバリーアプリ", "tags": ["digital", "service", "daily"], "weight": 1 },
-    { "id": "noise-cancel", "text": "ノイズキャンセリングイヤホン", "tags": ["digital", "daily", "personal"], "weight": 0.9 }
+    { "id": "smartphone", "text": "スマホ", "tags": ["digital", "modern", "daily", "consumer-tech"], "weight": 1.2 },
+    { "id": "qrpay", "text": "QR決済", "tags": ["digital", "modern", "service", "service-tech"], "weight": 1 },
+    { "id": "ai", "text": "AI", "tags": ["digital", "modern", "science", "specialist-tech"], "weight": 1 },
+    { "id": "drone", "text": "ドローン", "tags": ["digital", "modern", "moving", "field-tech"], "weight": 0.9 },
+    { "id": "vtuber", "text": "VTuberアバター", "tags": ["digital", "media", "showbiz", "media-role", "showbiz-role"], "weight": 0.95 },
+    { "id": "smartwatch", "text": "スマートウォッチ", "tags": ["digital", "modern", "daily", "consumer-tech"], "weight": 0.95 },
+    { "id": "food-delivery", "text": "フードデリバリーアプリ", "tags": ["digital", "service", "daily", "service-tech"], "weight": 1 },
+    { "id": "noise-cancel", "text": "ノイズキャンセリングイヤホン", "tags": ["digital", "daily", "personal", "consumer-tech"], "weight": 0.9 }
   ]
 }

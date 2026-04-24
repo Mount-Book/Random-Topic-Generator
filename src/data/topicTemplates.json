@@ -107,7 +107,31 @@
         "minSharedInheritedTags": 1
       },
       "person": {
-        "inheritTagsFromSlots": ["situation", "modern"]
+        "inheritTagsFromSlots": ["situation", "modern"],
+        "excludedTags": ["fantasy"],
+        "genericOnlyWeightMultiplier": 0.2,
+        "requiredTagsWhenSourceHasTags": [
+          {
+            "sourceSlot": "situation",
+            "sourceTags": ["school"],
+            "requiredAnyTagSets": [["school-role", "student-role"]]
+          },
+          {
+            "sourceSlot": "situation",
+            "sourceTags": ["formal"],
+            "requiredAnyTagSets": [["formal-role", "authority-role", "ritual-role", "specialist-role"]]
+          },
+          {
+            "sourceSlot": "modern",
+            "sourceTags": ["media-role"],
+            "requiredAnyTagSets": [["media-role", "showbiz-role"]]
+          },
+          {
+            "sourceSlot": "modern",
+            "sourceTags": ["science"],
+            "requiredAnyTagSets": [["science-role", "specialist-role"]]
+          }
+        ]
       }
     },
     "weight": 0.95,
@@ -129,7 +153,25 @@
       "person": {
         "inheritTagsFromSlots": ["place", "action"],
         "minSharedInheritedTags": 1,
-        "excludedTags": ["fantasy"]
+        "excludedTags": ["fantasy"],
+        "genericOnlyWeightMultiplier": 0.25,
+        "requiredTagsWhenSourceHasTags": [
+          {
+            "sourceSlot": "place",
+            "sourceTags": ["school-role"],
+            "requiredAnyTagSets": [["school-role", "student-role"]]
+          },
+          {
+            "sourceSlot": "place",
+            "sourceTags": ["formal-role"],
+            "requiredAnyTagSets": [["formal-role", "authority-role", "ritual-role"]]
+          },
+          {
+            "sourceSlot": "action",
+            "sourceTags": ["media"],
+            "requiredAnyTagSets": [["media-role", "showbiz-role"]]
+          }
+        ]
       }
     },
     "weight": 1,
@@ -146,7 +188,56 @@
     "slotConstraints": {
       "person": {
         "inheritTagsFromSlots": ["job", "modern"],
-        "excludedTags": ["fantasy"]
+        "excludedTags": ["fantasy"],
+        "minSharedMeaningfulTags": 1,
+        "genericOnlyWeightMultiplier": 0.15,
+        "requiredTagsWhenSourceHasTags": [
+          {
+            "sourceSlot": "job",
+            "sourceTags": ["service-role"],
+            "requiredAnyTagSets": [["service-role", "care-role", "showbiz-role"]]
+          },
+          {
+            "sourceSlot": "job",
+            "sourceTags": ["school-role"],
+            "requiredAnyTagSets": [["school-role", "student-role", "care-role"]]
+          },
+          {
+            "sourceSlot": "job",
+            "sourceTags": ["media-role"],
+            "requiredAnyTagSets": [["media-role", "showbiz-role"]]
+          },
+          {
+            "sourceSlot": "job",
+            "sourceTags": ["formal-role"],
+            "requiredAnyTagSets": [["formal-role", "specialist-role", "ritual-role", "authority-role"]]
+          },
+          {
+            "sourceSlot": "job",
+            "sourceTags": ["ceremony-role"],
+            "requiredAnyTagSets": [["ceremony-role", "ritual-role", "formal-role"]]
+          },
+          {
+            "sourceSlot": "job",
+            "sourceTags": ["animal-role"],
+            "requiredAnyTagSets": [["care-role", "showbiz-role"]]
+          },
+          {
+            "sourceSlot": "modern",
+            "sourceTags": ["service-tech"],
+            "requiredAnyTagSets": [["service-role", "care-role", "showbiz-role", "media-role"]]
+          },
+          {
+            "sourceSlot": "modern",
+            "sourceTags": ["media-role"],
+            "requiredAnyTagSets": [["media-role", "showbiz-role"]]
+          },
+          {
+            "sourceSlot": "modern",
+            "sourceTags": ["science"],
+            "requiredAnyTagSets": [["science-role", "specialist-role"]]
+          }
+        ]
       }
     },
     "weight": 1,
@@ -161,7 +252,41 @@
     ],
     "slotConstraints": {
       "place": {
-        "inheritTagsFromSlots": ["person"]
+        "inheritTagsFromSlots": ["person"],
+        "minSharedMeaningfulTags": 1,
+        "genericOnlyWeightMultiplier": 0.2,
+        "requiredTagsWhenSourceHasTags": [
+          {
+            "sourceSlot": "person",
+            "sourceTags": ["school-role"],
+            "requiredAnyTagSets": [["school-role", "student-role"]]
+          },
+          {
+            "sourceSlot": "person",
+            "sourceTags": ["care-role"],
+            "requiredAnyTagSets": [["care-role", "casual", "service-role"]]
+          },
+          {
+            "sourceSlot": "person",
+            "sourceTags": ["media-role"],
+            "requiredAnyTagSets": [["showbiz-role", "formal-role", "authority-role"]]
+          },
+          {
+            "sourceSlot": "person",
+            "sourceTags": ["formal-role"],
+            "requiredAnyTagSets": [["formal-role", "authority-role", "ritual-role"]]
+          },
+          {
+            "sourceSlot": "person",
+            "sourceTags": ["ritual-role"],
+            "requiredAnyTagSets": [["ritual-role", "ceremony-role", "formal-role"]]
+          },
+          {
+            "sourceSlot": "person",
+            "sourceTags": ["showbiz-role"],
+            "requiredAnyTagSets": [["showbiz-role", "service-role"]]
+          }
+        ]
       }
     },
     "weight": 1.05,
@@ -253,7 +378,35 @@
       },
       "person": {
         "inheritTagsFromSlots": ["place", "action"],
-        "excludedTags": ["fantasy"]
+        "excludedTags": ["fantasy"],
+        "genericOnlyWeightMultiplier": 0.2,
+        "requiredTagsWhenSourceHasTags": [
+          {
+            "sourceSlot": "place",
+            "sourceTags": ["school-role"],
+            "requiredAnyTagSets": [["school-role", "student-role"]]
+          },
+          {
+            "sourceSlot": "place",
+            "sourceTags": ["formal-role"],
+            "requiredAnyTagSets": [["formal-role", "authority-role", "ritual-role", "specialist-role"]]
+          },
+          {
+            "sourceSlot": "place",
+            "sourceTags": ["showbiz-role"],
+            "requiredAnyTagSets": [["showbiz-role", "media-role"]]
+          },
+          {
+            "sourceSlot": "action",
+            "sourceTags": ["opinion"],
+            "requiredAnyTagSets": [["media-role", "showbiz-role", "formal-role"]]
+          },
+          {
+            "sourceSlot": "action",
+            "sourceTags": ["media"],
+            "requiredAnyTagSets": [["media-role", "showbiz-role"]]
+          }
+        ]
       }
     },
     "weight": 1,
@@ -283,7 +436,47 @@
     ],
     "slotConstraints": {
       "place": {
-        "inheritTagsFromSlots": ["job"]
+        "inheritTagsFromSlots": ["job"],
+        "genericOnlyWeightMultiplier": 0.2,
+        "requiredTagsWhenSourceHasTags": [
+          {
+            "sourceSlot": "job",
+            "sourceTags": ["service-role"],
+            "requiredAnyTagSets": [["service-role", "casual", "travel-role"]]
+          },
+          {
+            "sourceSlot": "job",
+            "sourceTags": ["school-role"],
+            "requiredAnyTagSets": [["school-role", "student-role", "care-role"]]
+          },
+          {
+            "sourceSlot": "job",
+            "sourceTags": ["formal-role"],
+            "requiredAnyTagSets": [["formal-role", "authority-role", "ritual-role"]]
+          },
+          {
+            "sourceSlot": "job",
+            "sourceTags": ["ceremony-role"],
+            "requiredAnyTagSets": [["ceremony-role", "ritual-role", "service-role"]]
+          },
+          {
+            "sourceSlot": "job",
+            "sourceTags": ["animal-role"],
+            "requiredAnyTagSets": [["showbiz-role", "travel-role"]]
+          }
+        ],
+        "excludedTagPairs": [
+          {
+            "sourceSlot": "job",
+            "sourceTags": ["animal-role"],
+            "candidateTags": ["school-role"]
+          },
+          {
+            "sourceSlot": "job",
+            "sourceTags": ["service-role"],
+            "candidateTags": ["ritual-role"]
+          }
+        ]
       }
     },
     "weight": 1,
