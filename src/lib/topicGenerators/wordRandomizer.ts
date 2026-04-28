@@ -27,7 +27,14 @@ const createWordRandomizerCandidate = (
   template: TemplateDefinition,
   history: TopicFingerprint[],
 ): GeneratedCandidate | null => {
-  const selectedWords = buildSelectedWords(template)
+  let selectedWords: ReturnType<typeof buildSelectedWords>
+
+  try {
+    selectedWords = buildSelectedWords(template)
+  } catch {
+    return null
+  }
+
   const text = renderTemplate(template, selectedWords)
   const ngHits = evaluateNgRules(selectedWords)
 

@@ -1,0 +1,118 @@
+{
+  "rejectedCases": [
+    {
+      "name": "job-modern-long rejects convenience clerk grandma mismatch",
+      "templateId": "job-modern-long",
+      "targetSlot": "person",
+      "selectedWordIds": {
+        "job": "clerk",
+        "modern": "smartphone"
+      },
+      "rejectedWordIds": ["grandma"]
+    },
+    {
+      "name": "job-modern-long rejects barber transfer student mismatch",
+      "templateId": "job-modern-long",
+      "targetSlot": "person",
+      "selectedWordIds": {
+        "job": "barber",
+        "modern": "food-delivery"
+      },
+      "rejectedWordIds": ["transfer-student"]
+    },
+    {
+      "name": "job-place-secret-medium rejects zookeeper classroom mismatch",
+      "templateId": "job-place-secret-medium",
+      "targetSlot": "place",
+      "selectedWordIds": {
+        "job": "zookeeper"
+      },
+      "rejectedWordIds": ["classroom"]
+    },
+    {
+      "name": "person-place-reason-medium rejects transfer student onsen mismatch",
+      "templateId": "person-place-reason-medium",
+      "targetSlot": "place",
+      "selectedWordIds": {
+        "person": "transfer-student"
+      },
+      "rejectedWordIds": ["onsen"]
+    },
+    {
+      "name": "place-action-person-reaction-long rejects transfer student reviewing onsen",
+      "templateId": "place-action-person-reaction-long",
+      "targetSlot": "person",
+      "selectedWordIds": {
+        "place": "onsen",
+        "action": "review"
+      },
+      "rejectedWordIds": ["transfer-student"]
+    },
+    {
+      "name": "place-action-person-reaction-long rejects grandma reviewing family restaurant",
+      "templateId": "place-action-person-reaction-long",
+      "targetSlot": "person",
+      "selectedWordIds": {
+        "place": "family-restaurant",
+        "action": "review"
+      },
+      "rejectedWordIds": ["grandma"]
+    }
+  ],
+  "acceptedCases": [
+    {
+      "name": "job-modern-long still allows media-facing matches",
+      "templateId": "job-modern-long",
+      "targetSlot": "person",
+      "selectedWordIds": {
+        "job": "youtuber",
+        "modern": "vtuber"
+      },
+      "acceptedWordIds": ["idol", "announcer"]
+    },
+    {
+      "name": "person-place-reason-medium keeps school-compatible places",
+      "templateId": "person-place-reason-medium",
+      "targetSlot": "place",
+      "selectedWordIds": {
+        "person": "transfer-student"
+      },
+      "acceptedWordIds": ["classroom", "school-assembly"]
+    },
+    {
+      "name": "job-place-secret-medium keeps wedding planner ceremony places",
+      "templateId": "job-place-secret-medium",
+      "targetSlot": "place",
+      "selectedWordIds": {
+        "job": "wedding-planner"
+      },
+      "acceptedWordIds": ["wedding", "onsen"]
+    },
+    {
+      "name": "place-action-person-reaction-long keeps showbiz-compatible people",
+      "templateId": "place-action-person-reaction-long",
+      "targetSlot": "person",
+      "selectedWordIds": {
+        "place": "theme-park",
+        "action": "live-stream"
+      },
+      "acceptedWordIds": ["idol"]
+    },
+    {
+      "name": "place-action-person-reaction-long keeps formal-compatible people",
+      "templateId": "place-action-person-reaction-long",
+      "targetSlot": "person",
+      "selectedWordIds": {
+        "place": "court",
+        "action": "apologize"
+      },
+      "acceptedWordIds": ["announcer", "monk", "detective"]
+    }
+  ],
+  "bannedTexts": [
+    "コンビニ店員なのにスマホだけ異常に使いこなしているおばあちゃん。なぜそんなことに？",
+    "理容師なのにフードデリバリーアプリだけ異常に使いこなしている転校生。なぜそんなことに？",
+    "飼育員が教室でだけ見せる裏の顔",
+    "温泉旅館でレビューを書いている転校生を見た周囲の反応"
+  ]
+}

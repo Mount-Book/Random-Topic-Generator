@@ -19,12 +19,51 @@
     "tags": ["forbidden", "short", "clear"]
   },
   {
+    "id": "adjective-place-short",
+    "text": "{adjective}{noun}。どんな{noun}？",
+    "slots": [
+      { "key": "adjective", "category": "adjective" },
+      { "key": "noun", "category": "noun" }
+    ],
+    "slotConstraints": {
+      "noun": {
+        "inheritTagsFromSlots": ["adjective"],
+        "minSharedInheritedTags": 1,
+        "requiredTagsWhenSourceHasTags": [
+          {
+            "sourceSlot": "adjective",
+            "sourceTags": ["place-like-trigger"],
+            "requiredTags": ["place-noun"]
+          },
+          {
+            "sourceSlot": "adjective",
+            "sourceTags": ["school-like-trigger"],
+            "requiredTags": ["place-noun"]
+          },
+          {
+            "sourceSlot": "adjective",
+            "sourceTags": ["cheap-trigger"],
+            "requiredTags": ["product"]
+          }
+        ]
+      }
+    },
+    "weight": 1.1,
+    "tags": ["line", "short", "clear", "imaginable"]
+  },
+  {
     "id": "situation-reason-medium",
     "text": "{situation}なのに{action:teiru}理由",
     "slots": [
       { "key": "situation", "category": "situation" },
       { "key": "action", "category": "action" }
     ],
+    "slotConstraints": {
+      "action": {
+        "inheritTagsFromSlots": ["situation"],
+        "minSharedInheritedTags": 1
+      }
+    },
     "weight": 1.15,
     "tags": ["reason", "medium", "expansive"]
   },
@@ -45,6 +84,12 @@
       { "key": "place", "category": "place" },
       { "key": "person", "category": "person" }
     ],
+    "slotConstraints": {
+      "person": {
+        "inheritTagsFromSlots": ["place"],
+        "excludedTags": ["fantasy"]
+      }
+    },
     "weight": 1,
     "tags": ["line", "medium", "social"]
   },
@@ -56,6 +101,39 @@
       { "key": "modern", "category": "modern" },
       { "key": "person", "category": "person" }
     ],
+    "slotConstraints": {
+      "modern": {
+        "inheritTagsFromSlots": ["situation"],
+        "minSharedInheritedTags": 1
+      },
+      "person": {
+        "inheritTagsFromSlots": ["situation", "modern"],
+        "excludedTags": ["fantasy"],
+        "genericOnlyWeightMultiplier": 0.2,
+        "requiredTagsWhenSourceHasTags": [
+          {
+            "sourceSlot": "situation",
+            "sourceTags": ["school"],
+            "requiredAnyTagSets": [["school-role", "student-role"]]
+          },
+          {
+            "sourceSlot": "situation",
+            "sourceTags": ["formal"],
+            "requiredAnyTagSets": [["formal-role", "authority-role", "ritual-role", "specialist-role"]]
+          },
+          {
+            "sourceSlot": "modern",
+            "sourceTags": ["media-role"],
+            "requiredAnyTagSets": [["media-role", "showbiz-role"]]
+          },
+          {
+            "sourceSlot": "modern",
+            "sourceTags": ["science"],
+            "requiredAnyTagSets": [["science-role", "specialist-role"]]
+          }
+        ]
+      }
+    },
     "weight": 0.95,
     "tags": ["reason", "long", "contrast"]
   },
@@ -67,6 +145,35 @@
       { "key": "action", "category": "action" },
       { "key": "person", "category": "person" }
     ],
+    "slotConstraints": {
+      "action": {
+        "inheritTagsFromSlots": ["place"],
+        "minSharedInheritedTags": 1
+      },
+      "person": {
+        "inheritTagsFromSlots": ["place", "action"],
+        "minSharedInheritedTags": 1,
+        "excludedTags": ["fantasy"],
+        "genericOnlyWeightMultiplier": 0.25,
+        "requiredTagsWhenSourceHasTags": [
+          {
+            "sourceSlot": "place",
+            "sourceTags": ["school-role"],
+            "requiredAnyTagSets": [["school-role", "student-role"]]
+          },
+          {
+            "sourceSlot": "place",
+            "sourceTags": ["formal-role"],
+            "requiredAnyTagSets": [["formal-role", "authority-role", "ritual-role"]]
+          },
+          {
+            "sourceSlot": "action",
+            "sourceTags": ["media"],
+            "requiredAnyTagSets": [["media-role", "showbiz-role"]]
+          }
+        ]
+      }
+    },
     "weight": 1,
     "tags": ["scene", "medium", "social"]
   },
@@ -78,7 +185,366 @@
       { "key": "modern", "category": "modern" },
       { "key": "person", "category": "person" }
     ],
+    "slotConstraints": {
+      "person": {
+        "inheritTagsFromSlots": ["job", "modern"],
+        "excludedTags": ["fantasy"],
+        "minSharedMeaningfulTags": 1,
+        "genericOnlyWeightMultiplier": 0.15,
+        "requiredTagsWhenSourceHasTags": [
+          {
+            "sourceSlot": "job",
+            "sourceTags": ["service-role"],
+            "requiredAnyTagSets": [["service-role", "care-role", "showbiz-role"]]
+          },
+          {
+            "sourceSlot": "job",
+            "sourceTags": ["school-role"],
+            "requiredAnyTagSets": [["school-role", "student-role", "care-role"]]
+          },
+          {
+            "sourceSlot": "job",
+            "sourceTags": ["media-role"],
+            "requiredAnyTagSets": [["media-role", "showbiz-role"]]
+          },
+          {
+            "sourceSlot": "job",
+            "sourceTags": ["formal-role"],
+            "requiredAnyTagSets": [["formal-role", "specialist-role", "ritual-role", "authority-role"]]
+          },
+          {
+            "sourceSlot": "job",
+            "sourceTags": ["ceremony-role"],
+            "requiredAnyTagSets": [["ceremony-role", "ritual-role", "formal-role"]]
+          },
+          {
+            "sourceSlot": "job",
+            "sourceTags": ["animal-role"],
+            "requiredAnyTagSets": [["care-role", "showbiz-role"]]
+          },
+          {
+            "sourceSlot": "modern",
+            "sourceTags": ["service-tech"],
+            "requiredAnyTagSets": [["service-role", "care-role", "showbiz-role", "media-role"]]
+          },
+          {
+            "sourceSlot": "modern",
+            "sourceTags": ["media-role"],
+            "requiredAnyTagSets": [["media-role", "showbiz-role"]]
+          },
+          {
+            "sourceSlot": "modern",
+            "sourceTags": ["science"],
+            "requiredAnyTagSets": [["science-role", "specialist-role"]]
+          }
+        ]
+      }
+    },
     "weight": 1,
     "tags": ["role-swap", "long", "contrast"]
+  },
+  {
+    "id": "person-place-reason-medium",
+    "text": "{person}が{place}にいそうな理由",
+    "slots": [
+      { "key": "person", "category": "person" },
+      { "key": "place", "category": "place" }
+    ],
+    "slotConstraints": {
+      "place": {
+        "inheritTagsFromSlots": ["person"],
+        "minSharedMeaningfulTags": 1,
+        "genericOnlyWeightMultiplier": 0.2,
+        "requiredTagsWhenSourceHasTags": [
+          {
+            "sourceSlot": "person",
+            "sourceTags": ["school-role"],
+            "requiredAnyTagSets": [["school-role", "student-role"]]
+          },
+          {
+            "sourceSlot": "person",
+            "sourceTags": ["care-role"],
+            "requiredAnyTagSets": [["care-role", "casual", "service-role"]]
+          },
+          {
+            "sourceSlot": "person",
+            "sourceTags": ["media-role"],
+            "requiredAnyTagSets": [["showbiz-role", "formal-role", "authority-role"]]
+          },
+          {
+            "sourceSlot": "person",
+            "sourceTags": ["formal-role"],
+            "requiredAnyTagSets": [["formal-role", "authority-role", "ritual-role"]]
+          },
+          {
+            "sourceSlot": "person",
+            "sourceTags": ["ritual-role"],
+            "requiredAnyTagSets": [["ritual-role", "ceremony-role", "formal-role"]]
+          },
+          {
+            "sourceSlot": "person",
+            "sourceTags": ["showbiz-role"],
+            "requiredAnyTagSets": [["showbiz-role", "service-role"]]
+          }
+        ]
+      }
+    },
+    "weight": 1.05,
+    "tags": ["reason", "medium", "contrast"]
+  },
+  {
+    "id": "place-person-incident-short",
+    "text": "{place}にいる{person}、何があった？",
+    "slots": [
+      { "key": "place", "category": "place" },
+      { "key": "person", "category": "person" }
+    ],
+    "slotConstraints": {
+      "person": {
+        "inheritTagsFromSlots": ["place"],
+        "excludedTags": ["fantasy"]
+      }
+    },
+    "weight": 1.1,
+    "tags": ["reason", "short", "clear"]
+  },
+  {
+    "id": "job-action-reason-medium",
+    "text": "{job}のくせに{action:start}理由",
+    "slots": [
+      { "key": "job", "category": "job" },
+      { "key": "action", "category": "action" }
+    ],
+    "slotConstraints": {
+      "action": {
+        "inheritTagsFromSlots": ["job"]
+      }
+    },
+    "weight": 1,
+    "tags": ["reason", "medium", "contrast"]
+  },
+  {
+    "id": "situation-person-line-medium",
+    "text": "{situation}で{person}が一番言いそうなこと",
+    "slots": [
+      { "key": "situation", "category": "situation" },
+      { "key": "person", "category": "person" }
+    ],
+    "slotConstraints": {
+      "person": {
+        "inheritTagsFromSlots": ["situation"]
+      }
+    },
+    "weight": 1.05,
+    "tags": ["line", "medium", "clear"]
+  },
+  {
+    "id": "place-modern-usage-medium",
+    "text": "{place}でだけ通用する{modern}の使い方",
+    "slots": [
+      { "key": "place", "category": "place" },
+      { "key": "modern", "category": "modern" }
+    ],
+    "slotConstraints": {
+      "modern": {
+        "inheritTagsFromSlots": ["place"]
+      }
+    },
+    "weight": 1,
+    "tags": ["modern-mix", "medium", "contrast"]
+  },
+  {
+    "id": "person-modern-misread-medium",
+    "text": "{person}が{modern}を誤解していそうな理由",
+    "slots": [
+      { "key": "person", "category": "person" },
+      { "key": "modern", "category": "modern" }
+    ],
+    "weight": 1.05,
+    "tags": ["reason", "medium", "contrast"]
+  },
+  {
+    "id": "place-action-person-reaction-long",
+    "text": "{place}で{action:teiru}{person}を見た周囲の反応",
+    "slots": [
+      { "key": "place", "category": "place" },
+      { "key": "action", "category": "action" },
+      { "key": "person", "category": "person" }
+    ],
+    "slotConstraints": {
+      "action": {
+        "inheritTagsFromSlots": ["place"],
+        "minSharedInheritedTags": 1
+      },
+      "person": {
+        "inheritTagsFromSlots": ["place", "action"],
+        "excludedTags": ["fantasy"],
+        "genericOnlyWeightMultiplier": 0.2,
+        "requiredTagsWhenSourceHasTags": [
+          {
+            "sourceSlot": "place",
+            "sourceTags": ["school-role"],
+            "requiredAnyTagSets": [["school-role", "student-role"]]
+          },
+          {
+            "sourceSlot": "place",
+            "sourceTags": ["formal-role"],
+            "requiredAnyTagSets": [["formal-role", "authority-role", "ritual-role", "specialist-role"]]
+          },
+          {
+            "sourceSlot": "place",
+            "sourceTags": ["showbiz-role"],
+            "requiredAnyTagSets": [["showbiz-role", "media-role"]]
+          },
+          {
+            "sourceSlot": "action",
+            "sourceTags": ["opinion"],
+            "requiredAnyTagSets": [["media-role", "showbiz-role", "formal-role"]]
+          },
+          {
+            "sourceSlot": "action",
+            "sourceTags": ["media"],
+            "requiredAnyTagSets": [["media-role", "showbiz-role"]]
+          }
+        ]
+      }
+    },
+    "weight": 1,
+    "tags": ["scene", "long", "social"]
+  },
+  {
+    "id": "situation-person-calm-medium",
+    "text": "{situation}なのに{person}が冷静すぎる理由",
+    "slots": [
+      { "key": "situation", "category": "situation" },
+      { "key": "person", "category": "person" }
+    ],
+    "slotConstraints": {
+      "person": {
+        "inheritTagsFromSlots": ["situation"]
+      }
+    },
+    "weight": 1,
+    "tags": ["reason", "medium", "contrast"]
+  },
+  {
+    "id": "job-place-secret-medium",
+    "text": "{job}が{place}でだけ見せる裏の顔",
+    "slots": [
+      { "key": "job", "category": "job" },
+      { "key": "place", "category": "place" }
+    ],
+    "slotConstraints": {
+      "place": {
+        "inheritTagsFromSlots": ["job"],
+        "genericOnlyWeightMultiplier": 0.2,
+        "requiredTagsWhenSourceHasTags": [
+          {
+            "sourceSlot": "job",
+            "sourceTags": ["service-role"],
+            "requiredAnyTagSets": [["service-role", "casual", "travel-role"]]
+          },
+          {
+            "sourceSlot": "job",
+            "sourceTags": ["school-role"],
+            "requiredAnyTagSets": [["school-role", "student-role", "care-role"]]
+          },
+          {
+            "sourceSlot": "job",
+            "sourceTags": ["formal-role"],
+            "requiredAnyTagSets": [["formal-role", "authority-role", "ritual-role"]]
+          },
+          {
+            "sourceSlot": "job",
+            "sourceTags": ["ceremony-role"],
+            "requiredAnyTagSets": [["ceremony-role", "ritual-role", "service-role"]]
+          },
+          {
+            "sourceSlot": "job",
+            "sourceTags": ["animal-role"],
+            "requiredAnyTagSets": [["showbiz-role", "travel-role"]]
+          }
+        ],
+        "excludedTagPairs": [
+          {
+            "sourceSlot": "job",
+            "sourceTags": ["animal-role"],
+            "candidateTags": ["school-role"]
+          },
+          {
+            "sourceSlot": "job",
+            "sourceTags": ["service-role"],
+            "candidateTags": ["ritual-role"]
+          }
+        ]
+      }
+    },
+    "weight": 1,
+    "tags": ["scene", "medium", "contrast"]
+  },
+  {
+    "id": "modern-place-weird-medium",
+    "text": "{modern}を導入した{place}、何かがおかしい",
+    "slots": [
+      { "key": "modern", "category": "modern" },
+      { "key": "place", "category": "place" }
+    ],
+    "slotConstraints": {
+      "modern": {
+        "inheritTagsFromSlots": ["place"]
+      }
+    },
+    "weight": 1.05,
+    "tags": ["modern-mix", "medium", "contrast"]
+  },
+  {
+    "id": "person-job-talent-short",
+    "text": "{person}に{job}の才能を感じた瞬間",
+    "slots": [
+      { "key": "person", "category": "person" },
+      { "key": "job", "category": "job" }
+    ],
+    "weight": 1.05,
+    "tags": ["role-swap", "short", "imaginable"]
+  },
+  {
+    "id": "situation-action-excuse-medium",
+    "text": "{situation}で{action:start}やつの言い分",
+    "slots": [
+      { "key": "situation", "category": "situation" },
+      { "key": "action", "category": "action" }
+    ],
+    "slotConstraints": {
+      "action": {
+        "inheritTagsFromSlots": ["situation"],
+        "minSharedInheritedTags": 1
+      }
+    },
+    "weight": 1.05,
+    "tags": ["line", "medium", "contrast"]
+  },
+  {
+    "id": "place-warning-short",
+    "text": "{place}に貼ってありそうで実は怖い注意書き",
+    "slots": [
+      { "key": "place", "category": "place" }
+    ],
+    "weight": 1.1,
+    "tags": ["line", "short", "clear"]
+  },
+  {
+    "id": "person-situation-check-medium",
+    "text": "{person}が{situation}で最初に確認しそうなこと",
+    "slots": [
+      { "key": "person", "category": "person" },
+      { "key": "situation", "category": "situation" }
+    ],
+    "slotConstraints": {
+      "situation": {
+        "inheritTagsFromSlots": ["person"]
+      }
+    },
+    "weight": 1,
+    "tags": ["line", "medium", "imaginable"]
   }
 ]
